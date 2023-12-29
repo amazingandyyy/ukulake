@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "lint": "standard --fix **/*.js"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "glob": "^10.3.3",
+    "lodash": "^4.17.21",
+    "playright": "^0.0.22",
+    "recursive-diff": "^1.0.9"
+  },
+  "devDependencies": {
+    "standard": "*",
+    "winston": "^3.10.0"
+  }
+}

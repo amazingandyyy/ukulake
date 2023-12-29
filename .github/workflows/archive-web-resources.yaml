@@ -1,0 +1,43 @@
+name: archive web resources
+
+on:
+  # push:
+  #   branches: [ main ]
+  # schedule:
+  #   - cron: "0 0 * * *" # once a day at midnight
+  workflow_dispatch:
+
+jobs:
+  archive-web-resources:
+    permissions:
+      contents: write
+    name: archive web resources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set timezone to America/Los_Angeles
+        uses: szenius/set-timezone@v1.2
+        with:
+          timezoneLinux: "America/Los_Angeles"
+          timezoneMacos: "America/Los_Angeles"
+      - name: list files
+        run: tree -L 3 .
+
+      - name: archive web resources
+        run: ./scripts/archive-web-resources.sh
+
+      - name: check for modified files
+        id: git-check
+        run: echo ::set-output name=modified::$(if [ -n "$(git status --porcelain)" ]; then echo "true"; else echo "false"; fi)
+
+      - name: commit
+        if: steps.git-check.outputs.modified == 'true'
+        run:  |
+          current=$(date)
+          git config --global user.name 'dublin-threads-bot'
+          git config --global user.email 'dublin-threads@amazingandyyy.com'
+          git status
+          git add -A
+          echo $current
+          git commit -m 'feat(web-archive): archive web resources' -m "$current"
+          git push
