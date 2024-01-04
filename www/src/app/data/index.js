@@ -1,16 +1,16 @@
 import _ from 'lodash'
 import songs from '@/data/songs'
 
-function getSongs() {
-	return songs;
+function getSongs () {
+  return songs
 }
-function searchSong(song_title) {
-	return _.find(songs, {
-		title: song_title
-	});
+function searchSong (songTitle) {
+  return _.find(songs, {
+    title: songTitle
+  })
 }
 
 export {
-	getSongs,
-	searchSong
+  getSongs,
+  searchSong
 }
