@@ -10,7 +10,7 @@ const songs = [
       source: TabSourceType.sanjoseukeclub
     },
     video: {
-      url: 'https://www.youtube.com/embed/lxWLCu2_pMk',
+      url: 'https://www.youtube.com/watch?v=lxWLCu2_pMk',
       source: VidioSourceType.youtube
     }
   }

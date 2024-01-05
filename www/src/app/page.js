@@ -14,7 +14,7 @@ export default function Songs () {
 
   return (<div>{
     data.map(song => (<div key={song.title}>
-      <a href={`/song/v2/${encodeURIComponent(song.title)}`}>{song.title}</a>
+      <a href={`/song/${encodeURIComponent(song.title)}`}>{song.title}</a>
     </div>))
   }</div>)
 }
