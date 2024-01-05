@@ -35,3 +35,6 @@ body {
   transition: all .5s ease-in-out;
   background-color: white;
 }
+.grid-container {
+  height: calc(100% - 64px);
+}
