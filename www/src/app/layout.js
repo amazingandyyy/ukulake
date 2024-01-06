@@ -35,9 +35,10 @@ export const metadata = {
 
 export default function RootLayout ({ children }) {
   return (
-    <html lang="en">
-        <Script strategy="afterInteractive" id="gh4-1" src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} />
-        <Script strategy="afterInteractive" id="gh4-2" dangerouslySetInnerHTML={{
+    <html lang='en'>
+      <Script strategy='afterInteractive' id='gh4-1' src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} />
+      <Script
+        strategy='afterInteractive' id='gh4-2' dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){
@@ -47,18 +48,21 @@ export default function RootLayout ({ children }) {
   
             gtag('config', '${GA_TRACKING_ID}');
           `
-        }} />
-        <Script strategy="afterInteractive" id="crisp-1" dangerouslySetInnerHTML={{
+        }}
+      />
+      <Script
+        strategy='afterInteractive' id='crisp-1' dangerouslySetInnerHTML={{
           __html: `
             window.$crisp=[];window.CRISP_WEBSITE_ID="${CRISP_WEBSITE_ID}";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
           `
-        }} />
+        }}
+      />
 
       <Head>
-        <link rel="icon" type="image/png" sizes="32x32" href="https://ukulake.amazyyy.com/icons/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="https://ukulake.amazyyy.com/icons/favicon-16x16.png" />
-        <meta name="msapplication-TileColor" content="#0D8100" />
-        <meta name="msapplication-config" content="https://ukulake.amazyyy.com/icons/browserconfig.xml" />
+        <link rel='icon' type='image/png' sizes='32x32' href='https://ukulake.amazyyy.com/icons/favicon-32x32.png' />
+        <link rel='icon' type='image/png' sizes='16x16' href='https://ukulake.amazyyy.com/icons/favicon-16x16.png' />
+        <meta name='msapplication-TileColor' content='#0D8100' />
+        <meta name='msapplication-config' content='https://ukulake.amazyyy.com/icons/browserconfig.xml' />
       </Head>
       <body>
         {children}
