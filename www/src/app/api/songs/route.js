@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server'
 import { getSongs, searchSong } from '@/data'
-import youtubesearchapi from "youtube-search-api";
-import google from 'googlethis';
+import youtubesearchapi from 'youtube-search-api'
 
 // Request: /api/songs?name=andy
 // Response: { message: 'Hello andy!' }
 export async function GET (request) {
   const { searchParams } = new URL(request.url)
   const title = searchParams.get('title') || ''
-  const videoSearchLimit = searchParams.get('vlimit') || 10
+  const videoSearchLimit = searchParams.get('vlimit') || 20
   if (title) {
     // single song
     const data = searchSong(title)
-    const videoSearchResult = await youtubesearchapi.GetListByKeyword(`${title} ukulele tutorial`,false,videoSearchLimit, [{type:"video"}])
+    const videoSearchResult = await youtubesearchapi.GetListByKeyword(`${title} ukulele tutorial`, false, videoSearchLimit, [{ type: 'video' }])
 
     return NextResponse.json({
       island: data,
-      videoSearch: videoSearchResult,
+      videoSearch: videoSearchResult
     })
   } else {
     const data = getSongs()

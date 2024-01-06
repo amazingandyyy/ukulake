@@ -1,35 +1,35 @@
 import { create } from 'zustand'
 
 const useSearchStore = create((set, get) => ({
-  input: "",
-  song: {},
+  input: '',
   videoSrc: '',
   tabSrc: '',
   videoOptions: [],
   tabOptions: [],
   updateInput: (title) => {
-    set({input: title})
+    set({ input: title })
+  },
+  fetchIsland: (title, videoId) => {
     fetch(`/api/songs?title=${title}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
-        set({
-          videoOptions: data.videoSearch,
-          song: data.island,
-          videoSrc: data.island.video.url,
-          tabSrc: data.island.tab.url,
+        console.log(`response from /api/songs?title=${title}`, data)
+        set((state) => {
+          return ({
+            videoOptions: data.videoSearch,
+            song: data.island,
+            videoSrc: videoId ? state.videoSrc : data.island.video.url,
+            tabSrc: data.island.tab.url
+          })
         })
       })
   },
-  setSong: (song) => {
-    set({ song })
-  },
   setVideoSrc: (url) => {
-    set({ songSrc: url })
+    set({ videoSrc: url })
   },
-  setTabSrc: (song) => {
+  setTabSrc: (url) => {
     set({ tabSrc: url })
-  },
+  }
 }))
 
 export { useSearchStore }
