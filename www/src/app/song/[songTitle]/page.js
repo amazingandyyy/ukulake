@@ -3,11 +3,15 @@
 import { useEffect, useState } from 'react'
 
 export default function Page ({ params }) {
-  const title = decodeURIComponent(params.songTitle)
+  const [title, setTitle] = useState('')
   const [song, setSong] = useState(null)
   const [tabSrc, setTabSrc] = useState('')
   const [videoSrc, setVideoSrc] = useState('')
   const [settingActivated, setSettingActivated] = useState(false)
+
+  useEffect(() => {
+    setTitle(decodeURIComponent(params.songTitle))
+  }, [params]);
 
   function transformVideoSrc (url) {
     if (url.includes('www.youtube.com/embed/')) {
@@ -21,39 +25,43 @@ export default function Page ({ params }) {
     return 'https://www.youtube.com/embed/'
   }
   useEffect(() => {
-    fetch(`/api/songs?title=${title}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSong(data)
-        setTabSrc(`${data.tab.url}`)
-        setVideoSrc(data.video.url)
-      })
+    if(title) {
+      fetch(`/api/songs?title=${title}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setSong(data)
+          setTabSrc(`${data.tab.url}`)
+          setVideoSrc(data.video.url)
+        })
+    }
   }, [title])
   if (!song) return <p className='text-center m-8'></p>
   return (<div className='flex flex-col h-screen'>
-    <div className={`fixed right-0 md:right-2 top-16 bg-white shadow-2xl border-2 border-gray-300 p-4 rounded-xl w-full md:w-96 ${settingActivated ? 'block' : 'hidden'}`}>
+    <div className={`fixed right-0 md:right-2 top-12 md:top-16 bg-white shadow-2xl border-2 border-gray-300 p-4 rounded-xl w-full md:w-96 ${settingActivated ? 'block' : 'hidden'}`}>
       <div className='w-full'>
         <div className='pl-1 font-semibold text-sm'>Song resources (<a className='text-teal-800 hover:text-teal-600' rel="noreferrer" target='_blank' href={`https://www.google.com/search?igu=1&q="${title.split(' ').join('+')}"+"ukulele"+tutorial+site:youtube.com`}>Youtube</a> URL)</div>
         <input onChange={(e) => setVideoSrc(e.target.value)} className='bg-gray-100 p-2 px-4 rounded-xl mt-1 w-full' value={videoSrc} />
       </div>
       <div className='w-full pt-2'>
         <div className='pl-1 font-semibold text-sm'>Tab resources (<a className='text-teal-800 hover:text-teal-600' rel="noreferrer" target='_blank' href={`https://www.google.com/search?igu=1&q=${title.split(' ').join('+')}+ukulele+chords+tabs+filetype:pdf`}>PDF</a> URL)</div>
-        <input onChange={(e) => setTabSrc(e.target.value)}className='bg-gray-100 p-2 px-4 rounded-xl mt-1 w-full' value={tabSrc} />
+        <input onChange={(e) => setTabSrc(e.target.value)} className='bg-gray-100 p-2 px-4 rounded-xl mt-1 w-full' value={tabSrc} />
       </div>
     </div>
-      <div className="flex bg-white shadow-sm col-span-3 h-16 p-4 flex-row items-center justify-between">
+      <div className="flex bg-white shadow-sm col-span-3 h-12 md:h-16 p-2 md:p-4 flex-row items-center justify-between">
         <a href='/'>
-          <div className='hover:opacity-70 self-start font-semibold text-2xl'><span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span><span className='pl-1 text-gray-900'>Ukulake</span></div>
+          <div className='hover:opacity-70 self-start font-semibold text-2xl'>
+            <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
+            <span className='pl-1 text-gray-900'>Ukulake</span></div>
         </a>
+        <div className='ml-2 flex-1 p-2 rounded-xl bg-gray-100 m-1 flex items-center cursor-pointer hover:bg-gray-200'>
+          {/* logo */}
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+            <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
+            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clipRule="evenodd" />
+          </svg>
+          <input onChange={(e) => setTitle(e.target.value)} className='ml-1 px-2 rounded-md w-full bg-gray-100 border-none outline-0' value={title}/>
+        </div>
         <div className='flex'>
-          <div className='rounded-xl p-2 px-4 bg-gray-100 m-1 flex items-center cursor-pointer hover:bg-gray-200'>
-            {/* logo */}
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
-              <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clipRule="evenodd" />
-            </svg>
-            <span className='pl-2'>Search</span>
-          </div>
           <div onClick={() => setSettingActivated(!settingActivated)}className={`rounded-xl p-2 bg-gray-100 m-1 hover:bg-teal-600 hover:text-white cursor-pointer ${settingActivated ? 'bg-teal-500 text-white' : ''}`}>
             {/* setting icon */}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -68,11 +76,11 @@ export default function Page ({ params }) {
           </div>
         </div>
       </div>
-    <div className="grid grid-cols-3 grid-rows-3 grid-container p-4">
-      <div className="col-span-3 md:col-span-1 row-span-1 md:row-span-3 rounded-xl">
+    <div className="grid grid-cols-3 grid-container grow-rows-8 md:grid-rows-4 p-2 md:p-4">
+      <div className="col-span-3 md:col-span-1 row-span-2 md:row-span-4 rounded-xl">
         <iframe src={`${transformVideoSrc(videoSrc)}?start=0`} width='100%' height='100%' className='rounded-xl shadow-xl' frameBorder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowFullScreen />
       </div>
-      <div className="col-span-3 md:col-span-2 row-span-3 pt-4 md:pt-0 md:pl-4">
+      <div className="col-span-3 md:col-span-2 row-span-6 md:row-span-4 pt-2 md:pt-0 md:pl-4">
         <iframe className='rounded-xl shadow-xl' width='100%' height='100%' src={`${tabSrc}#view=FitH&navpanes=0&toolbar=0&statusbar=0&messages=0`} />
       </div>
     </div>

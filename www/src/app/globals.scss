@@ -36,5 +36,8 @@ body {
   background-color: white;
 }
 .grid-container {
-  height: calc(100% - 64px);
+  height: calc(100% - 48px);
+  @media not all and (min-width: 768px) {
+    height: calc(100% - 64px);
+  }
 }
