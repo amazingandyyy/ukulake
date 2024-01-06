@@ -60,15 +60,15 @@ export default function Page ({ params, query }) {
   return (
     <div className='flex flex-col h-screen'>
       <div
-        className={`fixed right-0 md:right-2 top-12 md:top-16 bg-white shadow-2xl border-2 border-gray-300 p-4 rounded-xl w-full md:w-96 ${settingActivated ? 'block' : 'hidden'}`}
+        className={`fixed right-0 md:right-16 top-12 md:top-12 bg-white shadow-2xl border-2 border-gray-300 p-4 rounded-xl w-full md:w-96 ${settingActivated ? 'block' : 'hidden'}`}
       >
         <div className='w-full'>
           <div className='pl-1 font-semibold text-sm'>Song resources</div>
-          <div className='rounded-xl mb-2 overflow-y-scroll block max-h-[600px]'>
+          <div className='rounded-xl mb-2 overflow-y-scroll block h-[400px]'>
             {videoOptions?.items?.map(videoOption => (
               <div
                 key={videoOption.id} onClick={() => changeVideoSrc(videoOption.id)}
-                className='w-full border-2 hover:border-teal-500 hover:opacity-80 cursor-pointer inline-block rounded-xl overflow-hidden mr-1 relative'
+                className={`${(videoOption.id === videoKey) && 'border-teal-700 opacity-80'} w-full border-4 hover:border-teal-500 hover:opacity-80 cursor-pointer inline-block rounded-xl overflow-hidden mr-1 relative`}
               >
                 <img src={videoOption.thumbnail.thumbnails[0].url} className='w-full h-full' />
                 <span
@@ -84,14 +84,14 @@ export default function Page ({ params, query }) {
             )
             )}
           </div>
-          or search on <a className='font-bold text-red-600 hover:text-red-700' rel='noreferrer' target='_blank' href={`https://www.google.com/search?igu=1&q="${title.split(' ').join('+')}"+"ukulele"+tutorial+site:youtube.com`}>Youtube</a>
+          or search on <a className='font-bold text-red-600 hover:text-red-500' rel='noreferrer' target='_blank' href={`https://www.google.com/search?igu=1&q="${title.split(' ').join('+')}"+"ukulele"+tutorial+site:youtube.com`}>Youtube</a>
           <input
             onChange={(e) => setVideoSrc(e.target.value)} className='bg-gray-100 p-2 px-4 rounded-xl mt-1 w-full'
             value={videoSrc}
           />
         </div>
         <div className='w-full pt-2'>
-          <div className='pl-1 font-semibold text-sm'>Tab resources (<a className='text-teal-800 hover:text-teal-600' rel='noreferrer' target='_blank' href={`https://www.google.com/search?igu=1&q=${title.split(' ').join('+')}+ukulele+chords+tabs+filetype:pdf`}>PDF</a> URL)
+          <div className='pl-1'><span className='font-bold'>Tab resources</span> or search PDF on <a className='text-blue-500 hover:text-blue-600 font-bold' rel='noreferrer' target='_blank' href={`https://www.google.com/search?igu=1&q=${title.split(' ').join('+')}+ukulele+chords+tabs+filetype:pdf`}>Google</a>
           </div>
           <input
             onChange={(e) => setTabSrc(e.target.value)} className='bg-gray-100 p-2 px-4 rounded-xl mt-1 w-full'
@@ -103,7 +103,7 @@ export default function Page ({ params, query }) {
         <a href='/'>
           <div className='hover:opacity-70 self-start font-semibold text-2xl'>
             <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
-            <span className='pl-1 text-gray-900'>Ukulake</span>
+            <span className='pl-1 text-gray-900 hidden md:inline-block'>Ukulake</span>
           </div>
         </a>
         <div className='ml-2 flex-1 p-2 rounded-xl bg-gray-100 m-1 flex items-center cursor-pointer'>

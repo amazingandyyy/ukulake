@@ -7,7 +7,7 @@ import youtubesearchapi from 'youtube-search-api'
 export async function GET (request) {
   const { searchParams } = new URL(request.url)
   const title = searchParams.get('title') || ''
-  const videoSearchLimit = searchParams.get('vlimit') || 20
+  const videoSearchLimit = searchParams.get('vlimit') || 25
   if (title) {
     // single song
     const data = searchSong(title)
