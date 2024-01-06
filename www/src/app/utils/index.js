@@ -1,4 +1,3 @@
-import Image from './image'
 const rootUrl = 'https://raw.githubusercontent.com/amazingandyyy/ukulake/main/docs'
 
 const fetchApi = (path) => {
@@ -48,4 +47,4 @@ function timeSince (date) {
   return Math.floor(seconds) + ' seconds'
 }
 
-export { fetchMeetings, fetchDevelopments, timeSince, Image, useArchivedSource }
+export { fetchMeetings, fetchDevelopments, timeSince, useArchivedSource }
