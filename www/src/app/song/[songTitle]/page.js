@@ -1,12 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import {useSearchStore} from "@/stores";
 
 export default function Page ({ params }) {
-  const [title, setTitle] = useState('')
-  const [song, setSong] = useState(null)
-  const [tabSrc, setTabSrc] = useState('')
-  const [videoSrc, setVideoSrc] = useState('')
+  const title = useSearchStore(state => state.input)
+  const setTitle = (value) => useSearchStore.getState().updateInput(value)
+  const song = useSearchStore(state => state.song)
+  const tabSrc = useSearchStore(state => state.tabSrc)
+  const setTabSrc = (url) => useSearchStore.getState().setTabSrc(url)
+  const videoSrc = useSearchStore(state => state.videoSrc)
+  const setVideoSrc = (url) => useSearchStore.getState().setVideoSrc(url)
+
   const [settingActivated, setSettingActivated] = useState(false)
 
   useEffect(() => {
@@ -25,15 +30,7 @@ export default function Page ({ params }) {
     return 'https://www.youtube.com/embed/'
   }
   useEffect(() => {
-    if (title) {
-      fetch(`/api/songs?title=${title}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setSong(data)
-          setTabSrc(`${data.tab.url}`)
-          setVideoSrc(data.video.url)
-        })
-    }
+    if (title) useSearchStore.getState().updateInput(title)
   }, [title])
   if (!song) return <p className='text-center m-8' />
   return (
@@ -55,13 +52,13 @@ export default function Page ({ params }) {
             <span className='pl-1 text-gray-900'>Ukulake</span>
           </div>
         </a>
-        <div className='ml-2 flex-1 p-2 rounded-xl bg-gray-100 m-1 flex items-center cursor-pointer hover:bg-gray-200'>
+        <div className='ml-2 flex-1 p-2 rounded-xl bg-gray-100 m-1 flex items-center cursor-pointer'>
           {/* logo */}
           <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
             <path d='M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z' />
             <path fillRule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z' clipRule='evenodd' />
           </svg>
-          <input onChange={(e) => setTitle(e.target.value)} className='ml-1 px-2 rounded-md w-full bg-gray-100 border-none outline-0' value={title} />
+          <input onChange={(e) => setTitle(e.target.value)} className='ml-1 px-2 rounded-md w-full bg-gray-100 hover:bg-gray-200 border-none outline-0' value={title} />
         </div>
         <div className='flex'>
           <div onClick={() => setSettingActivated(!settingActivated)} className={`rounded-xl p-2 bg-gray-100 m-1 hover:bg-teal-600 hover:text-white cursor-pointer ${settingActivated ? 'bg-teal-500 text-white' : ''}`}>
@@ -83,7 +80,8 @@ export default function Page ({ params }) {
           <iframe src={`${transformVideoSrc(videoSrc)}?start=0`} width='100%' height='100%' className='rounded-xl shadow-xl' frameBorder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowFullScreen />
         </div>
         <div className='col-span-3 md:col-span-2 row-span-6 md:row-span-4 pt-2 md:pt-0 md:pl-4'>
-          <iframe className='rounded-xl shadow-xl' width='100%' height='100%' src={`${tabSrc}#view=FitH&navpanes=0&toolbar=0&statusbar=0&messages=0`} />
+          {tabSrc && <iframe className='rounded-xl shadow-xl' width='100%' height='100%'
+                   src={`${tabSrc}#view=FitH&navpanes=0&toolbar=0&statusbar=0&messages=0`}/>}
         </div>
       </div>
     </div>
