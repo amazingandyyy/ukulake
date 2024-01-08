@@ -10,7 +10,7 @@ export default function Songs () {
     fetch('https://amazingandyyy.com/ukulake/index.json')
       .then((res) => res.json())
       .then((data) => {
-        const d = data.sort((a,b) => (a.title.replace(/[^a-zA-Z]+/g, '') > b.title.replace(/[^a-zA-Z0-9]+/g, '')) ? 1 : ((b.title.replace(/[^a-zA-Z0-9]+/g, '') > a.title.replace(/[^a-zA-Z0-9]+/g, '')) ? -1 : 0))
+        const d = data.sort((a, b) => (a.title.replace(/[^a-zA-Z]+/g, '') > b.title.replace(/[^a-zA-Z0-9]+/g, '')) ? 1 : ((b.title.replace(/[^a-zA-Z0-9]+/g, '') > a.title.replace(/[^a-zA-Z0-9]+/g, '')) ? -1 : 0))
         setData(_.uniqBy(d, 'title'))
       })
   }, [])
