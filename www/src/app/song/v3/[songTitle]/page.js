@@ -4,11 +4,12 @@ import { useEffect, useState, useCallback } from 'react'
 import { useSearchStore } from '@/stores'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
-export default function Page ({ params, query }) {
+export default function Page ({ params }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const videoKey = searchParams.get('v')
+  const source = searchParams.get('s')
 
   const title = useSearchStore(state => state.input)
   const videoOptions = useSearchStore(state => state.videoOptions)
@@ -43,28 +44,28 @@ export default function Page ({ params, query }) {
   }
 
   function transformVideoSrc (url) {
-    if (url.includes('www.youtube.com/embed/')) {
+    if (url.includes('youtube.com/embed/')) {
       return url
     }
-    if (url.includes('www.youtube.com/watch') && url.includes('v=')) {
+    if (url.includes('youtube.com/watch') && url.includes('v=')) {
       const u = new URL(url)
       const token = u.searchParams.get('v')
-      return `https://www.youtube.com/embed/${token}`
+      return `https://youtube.com/embed/${token}`
     }
-    return 'https://www.youtube.com/embed/'
+    return 'https://youtube.com/embed/'
   }
 
   useEffect(() => {
-    if (title) useSearchStore.getState().fetchIsland(title, videoKey)
+    if (title) useSearchStore.getState().fetchIsland(source, title, videoKey)
   }, [title, videoKey])
   return (
     <div className='flex flex-col h-screen'>
       <div
-        className={`fixed right-0 md:right-16 top-12 md:top-12 bg-white shadow-2xl border-2 border-gray-300 p-4 rounded-xl w-full md:w-96 ${settingActivated ? 'block' : 'hidden'}`}
+        className={`fixed right-0 md:right-16 top-12 md:top-12 bg-white shadow-2xl border-2 border-gray-300 p-4 rounded-xl w-full md:w-[500px] ${settingActivated ? 'block' : 'hidden'}`}
       >
         <div className='w-full'>
           <div className='pl-1 font-semibold text-sm'>Song resources</div>
-          <div className='rounded-xl mb-2 overflow-y-scroll block h-[400px]'>
+          <div className='rounded-xl mb-2 overflow-y-scroll block h-[600px]'>
             {videoOptions?.items?.map(videoOption => (
               <div
                 key={videoOption.id} onClick={() => changeVideoSrc(videoOption.id)}
@@ -103,24 +104,19 @@ export default function Page ({ params, query }) {
         <a href='/'>
           <div className='hover:opacity-70 self-start font-semibold text-2xl'>
             <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
-            <span className='pl-1 text-gray-900 hidden md:inline-block'>Ukulake</span>
+            <span className='pl-1 text-gray-900 inline-block'>Ukulake</span>
           </div>
         </a>
-        <div className='ml-2 flex-1 p-2 rounded-xl bg-gray-100 m-1 flex items-center cursor-pointer'>
+        <div className='ml-2 flex-1 p-2 rounded-xl m-1 flex items-center font-bold'>
           {/* logo */}
           <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
-            <path d='M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z' />
-            <path
-              fillRule='evenodd'
-              d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z'
-              clipRule='evenodd'
-            />
+            <path fillRule='evenodd' d='M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z' clipRule='evenodd' />
           </svg>
-          <input
-            onChange={(e) => setTitle(e.target.value)}
-            className='ml-1 px-2 rounded-md w-full bg-gray-100 hover:bg-gray-200 border-none outline-0'
-            value={title}
-          />
+          <div
+            // onChange={(e) => setTitle(e.target.value)}
+            className='ml-1 px-2 rounded-md w-full'
+          >{title}
+          </div>
         </div>
         <div className='flex'>
           <div
@@ -129,23 +125,18 @@ export default function Page ({ params, query }) {
           >
             {/* setting icon */}
             <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
-              <path
-                fillRule='evenodd'
-                d='M11.828 2.25c-.916 0-1.699.663-1.85 1.567l-.091.549a.798.798 0 0 1-.517.608 7.45 7.45 0 0 0-.478.198.798.798 0 0 1-.796-.064l-.453-.324a1.875 1.875 0 0 0-2.416.2l-.243.243a1.875 1.875 0 0 0-.2 2.416l.324.453a.798.798 0 0 1 .064.796 7.448 7.448 0 0 0-.198.478.798.798 0 0 1-.608.517l-.55.092a1.875 1.875 0 0 0-1.566 1.849v.344c0 .916.663 1.699 1.567 1.85l.549.091c.281.047.508.25.608.517.06.162.127.321.198.478a.798.798 0 0 1-.064.796l-.324.453a1.875 1.875 0 0 0 .2 2.416l.243.243c.648.648 1.67.733 2.416.2l.453-.324a.798.798 0 0 1 .796-.064c.157.071.316.137.478.198.267.1.47.327.517.608l.092.55c.15.903.932 1.566 1.849 1.566h.344c.916 0 1.699-.663 1.85-1.567l.091-.549a.798.798 0 0 1 .517-.608 7.52 7.52 0 0 0 .478-.198.798.798 0 0 1 .796.064l.453.324a1.875 1.875 0 0 0 2.416-.2l.243-.243c.648-.648.733-1.67.2-2.416l-.324-.453a.798.798 0 0 1-.064-.796c.071-.157.137-.316.198-.478.1-.267.327-.47.608-.517l.55-.091a1.875 1.875 0 0 0 1.566-1.85v-.344c0-.916-.663-1.699-1.567-1.85l-.549-.091a.798.798 0 0 1-.608-.517 7.507 7.507 0 0 0-.198-.478.798.798 0 0 1 .064-.796l.324-.453a1.875 1.875 0 0 0-.2-2.416l-.243-.243a1.875 1.875 0 0 0-2.416-.2l-.453.324a.798.798 0 0 1-.796.064 7.462 7.462 0 0 0-.478-.198.798.798 0 0 1-.517-.608l-.091-.55a1.875 1.875 0 0 0-1.85-1.566h-.344ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z'
-                clipRule='evenodd'
-              />
+              <path d='M18.75 12.75h1.5a.75.75 0 0 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM12 6a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 6ZM12 18a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 18ZM3.75 6.75h1.5a.75.75 0 1 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM5.25 18.75h-1.5a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5ZM3 12a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 3 12ZM9 3.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM12.75 12a2.25 2.25 0 1 1 4.5 0 2.25 2.25 0 0 1-4.5 0ZM9 15.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z' />
             </svg>
           </div>
-          <div
-            className='rounded-xl p-2 bg-gray-100 m-1 hover:bg-teal-500 hover:text-white cursor-pointer flex items-center'
-          >
-            {/* sharing icon */}
-            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' className='w-5 h-5'>
-              <path
-                d='M13 4.5a2.5 2.5 0 1 1 .702 1.737L6.97 9.604a2.518 2.518 0 0 1 0 .792l6.733 3.367a2.5 2.5 0 1 1-.671 1.341l-6.733-3.367a2.5 2.5 0 1 1 0-3.475l6.733-3.366A2.52 2.52 0 0 1 13 4.5Z'
-              />
-            </svg>
-          </div>
+          {/* <div */}
+          {/*  className='rounded-xl p-2 bg-gray-100 m-1 hover:bg-teal-500 hover:text-white cursor-pointer flex items-center' */}
+          {/* > */}
+          {/*  /!* pdf icon *!/ */}
+          {/*  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> */}
+          {/*    <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" /> */}
+          {/*    <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" /> */}
+          {/*  </svg> */}
+          {/* </div> */}
         </div>
       </div>
       <div className='grid grid-cols-3 grid-container grow-rows-8 md:grid-rows-4 p-2 md:p-4'>
