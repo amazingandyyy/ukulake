@@ -32,7 +32,7 @@ async function scrape (website) {
           // Pushing data to the array
           if (originalSrc && fileName && title) {
             const obj = {
-              tabSrc: `https://amazingandyyy.com/ukulake/${source}/${pdfKey}.pdf`,
+              tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${pdfKey}.pdf`,
               source: source,
               originalSrc,
               title,

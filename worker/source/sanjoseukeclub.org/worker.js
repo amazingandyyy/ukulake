@@ -56,7 +56,7 @@ async function scrape (website) {
     // Displaying the result as JSON
     writeJsonToFileForce(absolutePath(`docs/${source}/songs.json`), songs)
     writeJsonToFileForce(absolutePath(`docs/${source}/stats.json`), stats)
-    writeToFileForce(absolutePath(`docs/${source}/tabs`), tabs)
+    if (tabs) writeToFileForce(absolutePath(`docs/${source}/tabs`), tabs)
   })
 }
 
