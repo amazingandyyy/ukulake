@@ -1,23 +1,29 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import _ from 'lodash'
+
 export default function Songs () {
   const [data, setData] = useState(null)
 
   useEffect(() => {
     fetch('https://amazingandyyy.com/ukulake/index.json')
       .then((res) => res.json())
-      .then((data) => setData(data))
+      .then((data) => {
+        const d = data.sort((a,b) => (a.title.replace(/[^a-zA-Z]+/g, '') > b.title.replace(/[^a-zA-Z0-9]+/g, '')) ? 1 : ((b.title.replace(/[^a-zA-Z0-9]+/g, '') > a.title.replace(/[^a-zA-Z0-9]+/g, '')) ? -1 : 0))
+        setData(_.uniqBy(d, 'title'))
+      })
   }, [])
   if (!data) return <p className='text-center m-8'>Loading...</p>
 
   return (
     <div className='flex flex-col h-screen items-center'>
-      <div className='flex bg-white shadow-sm col-span-3 h-12 md:h-16 p-2 md:p-4 flex-row items-center justify-between'>
+      <div className='flex col-span-3 h-12 md:h-16 p-2 md:p-4 flex-row items-center justify-between'>
         <a href='/'>
           <div className='hover:opacity-70 font-semibold text-2xl'>
             <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
             <span className='pl-1 text-gray-900'>Ukulake</span>
+            <span className='pl-1 text-gray-900 font-light'>Harbor</span>
           </div>
         </a>
         {/* <div className='ml-2 flex-1 p-2 rounded-xl bg-gray-100 m-1 flex items-center'> */}
@@ -36,7 +42,7 @@ export default function Songs () {
         {
           data.map(song => {
             return (
-              <a href={`/island/${encodeURIComponent(song.title)}?s=${song.source}`} key={song.title} className='col-span-3 md:col-span-1 hover:opacity-70 bg-gray-50 rounded-md p-2 px-4 hover:text-teal-800'>
+              <a href={`/island/${encodeURIComponent(song.title)}?s=${song.source}`} key={song.tabSrc} className='col-span-3 md:col-span-1 hover:opacity-70 rounded-md p-2 px-4 hover:text-teal-800 bg-gray-50'>
                 <span>{song.title}</span>
                 <span className='font-medium text-xs text-black opacity-30 block'>{song.source}</span>
               </a>

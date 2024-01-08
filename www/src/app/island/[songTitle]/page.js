@@ -105,6 +105,7 @@ export default function Page ({ params }) {
           <div className='hover:opacity-70 self-start font-semibold text-2xl'>
             <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
             <span className='pl-1 text-gray-900 inline-block'>Ukulake</span>
+            <span className='pl-1 text-gray-900 font-light'>Island</span>
           </div>
         </a>
         <div className='ml-2 flex-1 p-2 rounded-xl m-1 flex items-center font-bold'>
