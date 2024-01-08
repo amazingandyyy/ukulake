@@ -48,6 +48,8 @@ while IFS= read -r url; do
     fi
 done < "$file_path"
 
+rm -rf $download_dir/*.pdf.*
+
 # Add and commit remaining files (if less than 100) after the loop ends
 if [ $((file_count % 100)) -ne 0 ]; then
     git -C "$download_dir" add .
