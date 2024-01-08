@@ -2,6 +2,7 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const path = require('path')
 const { writeJsonToFileForce, writeToFileForce, absolutePath } = require('../../utils')
+const htmlKeyToPdfKey = require('./dict.json')
 
 async function scrape (website) {
   const u = new URL(website)
@@ -15,7 +16,7 @@ async function scrape (website) {
 
     $('li').each(async (index, element) => {
       let labels = ['doctoruke']
-      if(index > 6 & index < 3000) {
+      if(index > 6) {
         const link = $(element).find('a').first().attr('href')
         let originalSrc = `https://www.${source}${link}`
         if(link.includes('.pdf')) {
@@ -26,11 +27,11 @@ async function scrape (website) {
           const artistName = $(element).contents().filter(function() {
             return this.nodeType === 3; // Filter only text nodes
           }).text().trim();
+          const pdfKey = htmlKeyToPdfKey[fileName]
           // Pushing data to the array
           if (originalSrc && fileName && title) {
             const obj = {
-              fileName: `${fileName}.pdf`,
-              tabSrc: `https://amazingandyyy.com/ukulake/${source}/${fileName}.pdf`,
+              tabSrc: `https://amazingandyyy.com/ukulake/${source}/${pdfKey}.pdf`,
               source: source,
               originalSrc,
               title,
@@ -45,28 +46,8 @@ async function scrape (website) {
               obj.additionalData.artist = artistName.replace('(', '').replace(')', '')
             }
             songs.push(obj)
-            try {
-              if(originalSrc.includes('https://www.doctoruke.com/_player/')) {
-                const fetchOriginalSrc= axios.get(originalSrc)
-                tabsPromises.push(fetchOriginalSrc)
-                try {
-                  const response = await fetchOriginalSrc;
-                  const c = cheerio.load(response.data)
-                  const pdfName = c('script:contains("var pdfName")').text().match(/var pdfName = "(.*?)";/);
-                  const extractedPDFName = pdfName ? pdfName[1] : null;
-                  const pdfUrl = `https://www.${source}/${extractedPDFName}.pdf`
-                  console.log(index, pdfUrl)
-                  tabs += `${pdfUrl}\n`
-                } catch (e) {
-                  console.error('failed to get pdf', e.message)
-                }
-              }else if (originalSrc.includes('.pdf')){
-                console.log(originalSrc)
-                tabs += `${originalSrc}\n`
-              }
-            } catch (e) {
-              console.error(e.message)
-            }
+
+            tabs+= `https://www.doctoruke.com/${pdfKey}.pdf\n`
           }
       }
     })
@@ -79,12 +60,7 @@ async function scrape (website) {
     // Displaying the result as JSON
     writeJsonToFileForce(absolutePath(`docs/${source}/songs.json`), songs)
     writeJsonToFileForce(absolutePath(`docs/${source}/stats.json`), stats)
-    Promise.all(tabsPromises).then(()=>{
-      console.log('goood')
-      writeToFileForce(absolutePath(`docs/${source}/tabs`), tabs)
-    }).catch(e=>{
-      console.error(e.message)
-    })
+    writeToFileForce(absolutePath(`docs/${source}/tabs`), tabs)
   })
 }
 
