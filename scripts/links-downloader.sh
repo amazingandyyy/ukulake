@@ -38,8 +38,8 @@ while IFS= read -r url; do
         wget -P "$download_dir" "$url"
         ((file_count++)) # Increment the file count after each download
 
-        # Check if the file count reaches 200
-        if [ $((file_count % 200)) -eq 0 ]; then
+        # Check if the file count reaches 100
+        if [ $((file_count % 100)) -eq 0 ]; then
             # Add all downloaded files, commit, and push to Git
             git -C "$download_dir" add .
             git -C "$download_dir" commit -m "feat: index $2"
@@ -48,8 +48,8 @@ while IFS= read -r url; do
     fi
 done < "$file_path"
 
-# Add and commit remaining files (if less than 200) after the loop ends
-if [ $((file_count % 200)) -ne 0 ]; then
+# Add and commit remaining files (if less than 100) after the loop ends
+if [ $((file_count % 100)) -ne 0 ]; then
     git -C "$download_dir" add .
     git -C "$download_dir" commit -m "feat: index $2"
     git -C "$download_dir" push origin main # Change 'main' to your branch name

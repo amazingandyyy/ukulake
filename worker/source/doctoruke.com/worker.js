@@ -22,12 +22,13 @@ async function scrape (website) {
         if(link.includes('.pdf')) {
           originalSrc = `https://www.${source}/${link}`
         }
-          const fileName = originalSrc.replace(`https://www.${source}`, '').replace('/_player/', '').replace('.html', '').replace('.pdf', '').trim()
+          const fileName = originalSrc.replace(`https://www.${source}`, '').replace('/_player/', '').replace('.html', '').replace('.pdf', '').replace('_medleys', '').replace(/\//g, '').trim()
           const title = $(element).find('a').text().replace('BAR', '')
           const artistName = $(element).contents().filter(function() {
             return this.nodeType === 3; // Filter only text nodes
           }).text().trim();
-          const pdfKey = htmlKeyToPdfKey[fileName]
+          const pdfKey = htmlKeyToPdfKey[fileName] || fileName
+          // if(pdfKey===) console.log(`${fileName} doesn't have pdfKey`)
           // Pushing data to the array
           if (originalSrc && fileName && title) {
             const obj = {
