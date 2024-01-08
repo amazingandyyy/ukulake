@@ -21,6 +21,9 @@ if [ ! -f "$file_path" ]; then
     exit 1
 fi
 
+# Initialize a counter for downloaded files
+file_count=0
+
 # Loop through each line in the file
 while IFS= read -r url; do
     # Extract the filename from the URL
@@ -33,5 +36,21 @@ while IFS= read -r url; do
     else
         # Download the PDF file using wget
         wget -P "$download_dir" "$url"
+        ((file_count++)) # Increment the file count after each download
+
+        # Check if the file count reaches 200
+        if [ $((file_count % 200)) -eq 0 ]; then
+            # Add all downloaded files, commit, and push to Git
+            git -C "$download_dir" add .
+            git -C "$download_dir" commit -m "feat: index $2"
+            git -C "$download_dir" push origin main # Change 'main' to your branch name
+        fi
     fi
 done < "$file_path"
+
+# Add and commit remaining files (if less than 200) after the loop ends
+if [ $((file_count % 200)) -ne 0 ]; then
+    git -C "$download_dir" add .
+    git -C "$download_dir" commit -m "feat: index $2"
+    git -C "$download_dir" push origin main # Change 'main' to your branch name
+fi

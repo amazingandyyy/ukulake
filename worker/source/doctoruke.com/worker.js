@@ -11,23 +11,28 @@ async function scrape (website) {
     const $ = cheerio.load(content.data)
     const songs = []
     let tabs = ''
+    const tabsPromises = []
 
-    $('li').each((index, element) => {
+    $('li').each(async (index, element) => {
       let labels = ['doctoruke']
-      if(index > 5) {
-          const fileName = $(element).find('a').attr('href').replace('/_player/', '').replace('.html', '').replace('.pdf', '').trim()
+      if(index > 6 & index < 3000) {
+        const link = $(element).find('a').first().attr('href')
+        let originalSrc = `https://www.${source}${link}`
+        if(link.includes('.pdf')) {
+          originalSrc = `https://www.${source}/${link}`
+        }
+          const fileName = originalSrc.replace(`https://www.${source}`, '').replace('/_player/', '').replace('.html', '').replace('.pdf', '').trim()
           const title = $(element).find('a').text().replace('BAR', '')
           const artistName = $(element).contents().filter(function() {
             return this.nodeType === 3; // Filter only text nodes
           }).text().trim();
           // Pushing data to the array
-          if (fileName && title) {
-            const originalTab = `https://${source}/${fileName}.pdf`
+          if (originalSrc && fileName && title) {
             const obj = {
               fileName: `${fileName}.pdf`,
               tabSrc: `https://amazingandyyy.com/ukulake/${source}/${fileName}.pdf`,
               source: source,
-              originalSrc: `https://${source}/_player/${fileName}.html`,
+              originalSrc,
               title,
               labels,
               additionalData: {}
@@ -40,7 +45,28 @@ async function scrape (website) {
               obj.additionalData.artist = artistName.replace('(', '').replace(')', '')
             }
             songs.push(obj)
-            tabs += `${originalTab}\n`
+            try {
+              if(originalSrc.includes('https://www.doctoruke.com/_player/')) {
+                const fetchOriginalSrc= axios.get(originalSrc)
+                tabsPromises.push(fetchOriginalSrc)
+                try {
+                  const response = await fetchOriginalSrc;
+                  const c = cheerio.load(response.data)
+                  const pdfName = c('script:contains("var pdfName")').text().match(/var pdfName = "(.*?)";/);
+                  const extractedPDFName = pdfName ? pdfName[1] : null;
+                  const pdfUrl = `https://www.${source}/${extractedPDFName}.pdf`
+                  console.log(index, pdfUrl)
+                  tabs += `${pdfUrl}\n`
+                } catch (e) {
+                  console.error('failed to get pdf', e.message)
+                }
+              }else if (originalSrc.includes('.pdf')){
+                console.log(originalSrc)
+                tabs += `${originalSrc}\n`
+              }
+            } catch (e) {
+              console.error(e.message)
+            }
           }
       }
     })
@@ -53,7 +79,12 @@ async function scrape (website) {
     // Displaying the result as JSON
     writeJsonToFileForce(absolutePath(`docs/${source}/songs.json`), songs)
     writeJsonToFileForce(absolutePath(`docs/${source}/stats.json`), stats)
-    writeToFileForce(absolutePath(`docs/${source}/tabs`), tabs)
+    Promise.all(tabsPromises).then(()=>{
+      console.log('goood')
+      writeToFileForce(absolutePath(`docs/${source}/tabs`), tabs)
+    }).catch(e=>{
+      console.error(e.message)
+    })
   })
 }
 
