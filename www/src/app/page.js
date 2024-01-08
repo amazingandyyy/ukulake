@@ -1,12 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
 export default function Songs () {
   const [data, setData] = useState(null)
 
   useEffect(() => {
-    fetch('https://amazingandyyy.com/ukulake/sanjoseukeclub.org/songs.json')
+    fetch('https://amazingandyyy.com/ukulake/index.json')
       .then((res) => res.json())
       .then((data) => setData(data))
   }, [])

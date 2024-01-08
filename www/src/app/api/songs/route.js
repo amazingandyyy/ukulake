@@ -1,19 +1,13 @@
 import { NextResponse } from 'next/server'
 import youtubesearchapi from 'youtube-search-api'
-import axios from 'axios'
 import _ from 'lodash'
+import songs from '../../_data/index.json'
 
 async function searchSong (source, title) {
-  try {
-    const res = await axios.get(`https://amazingandyyy.com/ukulake/${source}/songs.json`)
-    const songs = res.data
-    return _.find(songs, {
-      source,
-      title
-    })
-  } catch (e) {
-    console.error(e.message)
-  }
+  return _.find(songs, {
+    source,
+    title
+  })
 }
 // Request: /api/songs?name=andy
 // Response: { message: 'Hello andy!' }

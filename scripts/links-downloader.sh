@@ -48,7 +48,9 @@ while IFS= read -r url; do
     fi
 done < "$file_path"
 
+# clean up
 rm -rf $download_dir/*.pdf.*
+$ROOT_DIR/scripts/generate-api.sh
 
 # Add and commit remaining files (if less than 100) after the loop ends
 if [ $((file_count % 100)) -ne 0 ]; then
