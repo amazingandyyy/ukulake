@@ -30,7 +30,7 @@ async function scrape (website) {
           const pdfKey = htmlKeyToPdfKey[fileName] || fileName
           // if(pdfKey===) console.log(`${fileName} doesn't have pdfKey`)
           // Pushing data to the array
-          if (originalSrc && fileName && title) {
+          if (originalSrc && fileName && title && !fileName.includes('http:') && !fileName.includes('https:')) {
             const obj = {
               tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${pdfKey}.pdf`,
               source: source,
