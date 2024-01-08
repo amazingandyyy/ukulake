@@ -12,7 +12,7 @@ export const metadata = {
     'shortcut icon': '/icons/favicon.ico',
     'mask-icon': {
       href: '/icons/safari-pinned-tab.svg',
-      color: '#2AA34A'
+      color: '#289488'
     },
     manifest: '/icons/site.webmanifest'
   },
@@ -21,7 +21,7 @@ export const metadata = {
     description: 'Built by a software engineer who recently have hard time finding tabs or song books for ukulele for free.',
     url: 'https://ukulake.amazyyy.com',
     siteName: 'Ukulake',
-    themeColor: '#2AA34A',
+    themeColor: '#289488',
     images: [
       {
         url: '/images/hero.png',
@@ -59,10 +59,14 @@ export default function RootLayout ({ children }) {
       />
 
       <Head>
-        <link rel='icon' type='image/png' sizes='32x32' href='https://ukulake.amazyyy.com/icons/favicon-32x32.png' />
-        <link rel='icon' type='image/png' sizes='16x16' href='https://ukulake.amazyyy.com/icons/favicon-16x16.png' />
-        <meta name='msapplication-TileColor' content='#0D8100' />
-        <meta name='msapplication-config' content='https://ukulake.amazyyy.com/icons/browserconfig.xml' />
+        {/* https://realfavicongenerator.net/favicon_result?file_id=p1hjjif9kp1nc9ts21chmbffi796*/}
+        <link rel='apple-touch-icon' sizes='180x180' href='/icons/apple-touch-icon.png' />
+        <link rel='icon' type='image/png' sizes='32x32' href='/icons/favicon-32x32.png' />
+        <link rel='icon' type='image/png' sizes='16x16' href='/icons/favicon-16x16.png' />
+        <link rel='manifest' href='/icons/site.webmanifest' />
+        <link rel='mask-icon' href='/icons/safari-pinned-tab.svg' color='#5bbad5' />
+        <meta name='msapplication-TileColor' content='#da532c' />
+        <meta name='theme-color' content='#ffffff' />
       </Head>
       <body>
         {children}

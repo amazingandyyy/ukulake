@@ -9,7 +9,7 @@ const useSearchStore = create((set, get) => ({
   updateInput: (title) => {
     set({ input: title })
   },
-  fetchIsland: (source, title) => {
+  fetchIsland: (source, title, videoKey) => {
     const url = `/api/songs?title=${title}&source=${source}`
     fetch(url)
       .then((res) => res.json())
@@ -19,7 +19,7 @@ const useSearchStore = create((set, get) => ({
           return ({
             videoOptions: data.videoSearch,
             song: data.song,
-            videoSrc: `https://www.youtube.com/watch?v=${data.videoSearch.items[0].id}`,
+            videoSrc: videoKey ? `https://www.youtube.com/watch?v=${videoKey}` : `https://www.youtube.com/watch?v=${data.videoSearch.items[0].id}`,
             tabSrc: data.song.tabSrc
           })
         })
