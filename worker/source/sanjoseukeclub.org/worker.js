@@ -24,7 +24,10 @@ async function scrape (website) {
         const fileName = path.basename(decodeURIComponent(href))
         let concatenatedText = ''
         $(p).find('span').each((index, span) => {
-          concatenatedText += $(span).text()
+          const text = $(span).text()
+          if(!concatenatedText.includes(text)) {
+            concatenatedText += text
+          }
         })
         const cleanedDisplayText = concatenatedText.replace(/\s+/g, ' ').trim()
 
