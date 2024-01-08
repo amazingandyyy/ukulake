@@ -36,7 +36,7 @@ async function scrape (website) {
           const originalSrc = `https://sanjoseukeclub.org/${href}`
           songs.push({
             fileName,
-            tabSrc: `https://amazingandyyy.com/ukulake/sanjoseukeclub.org/${fileName}`,
+            tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${fileName}`,
             source: source,
             originalSrc,
             title: cleanedDisplayText,
