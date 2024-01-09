@@ -37,7 +37,7 @@ const q = async.queue(function(task, callback) {
         }
         if(artist) d.additionalData.artist = artist;
         if(musicalKey) d.additionalData.musicalKey = musicalKey;
-        writeJsonToFileForce(`docs/${source}/info/${title}.json`, d, {silent: true});
+        writeJsonToFileForce(absolutePath(`docs/${source}/info/${title}.json`), d, {silent: true});
       }else{
         logger.warn(`something is missing, url:${url} , title:${title}, artist:${artist}, musicalKey:${musicalKey}`)
       }

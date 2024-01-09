@@ -35,7 +35,7 @@ while IFS= read -r url; do
         echo "File $file_name already exists. Skipping download."
     else
         # Download the PDF file using wget
-        wget -P --no-clobber "$download_dir" "$url"
+        wget -P "$download_dir" "$url"
 
         pushd $download_dir
         for file in *\ *; do
@@ -55,18 +55,16 @@ while IFS= read -r url; do
         if [ $((file_count % 50)) -eq 0 ]; then
             # Add all downloaded files, commit, and push to Git
             git -C "$download_dir" add .
-            git -C "$download_dir" commit -m "feat: index $2"
+            git -C "$download_dir" commit -m "feat: index $2 with $file_count islands"
             git -C "$download_dir" push origin main # Change 'main' to your branch name
         fi
     fi
 done < "$file_path"
-
-rm -rf $download_dir/*.pdf.*
 #$ROOT_DIR/scripts/generate-api.sh
 
 # Add and commit remaining files (if less than 50) after the loop ends
 if [ $((file_count % 50)) -ne 0 ]; then
     git -C "$download_dir" add .
-    git -C "$download_dir" commit -m "feat: index $2"
+    git -C "$download_dir" commit -m "feat: index $2 with $file_count islands"
     git -C "$download_dir" push origin main # Change 'main' to your branch name
 fi
