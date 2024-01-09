@@ -26,14 +26,14 @@ const readFileWithDefaultValue = (path, defaultValue) => {
           return JSON.parse(defaultValue)
         })
       } else {
-        const d = fs.readFileSync(path, 'utf8');
+        const d = fs.readFileSync(path, 'utf8')
         return JSON.parse(d)
       }
     })
   })
 }
 
-const writeToFileForce = (path, data, opts={}) => {
+const writeToFileForce = (path, data, opts = {}) => {
   if (!opts.silent) logger.info(`writeToFile: ${path}`)
   const directory = path.split('/').slice(0, -1).join('/')
   fs.mkdir(directory, { recursive: true }, (err) => {
@@ -77,7 +77,7 @@ const appendToFileForce = (path, data) => {
 
 const resetFile = (path) => {
   logger.info(`resetFile: ${path}`)
-  fs.unlinkSync(path);
+  fs.unlinkSync(path)
 }
 const appendToJsonArrayForce = (path, data) => {
   logger.info(`appendToJsonFileForce: ${path}`)
@@ -108,7 +108,7 @@ exports.appendToFileForce = appendToFileForce
 exports.resetFile = resetFile
 exports.readFileWithDefaultValue = readFileWithDefaultValue
 
-exports.writeJsonToFileForce = (path, data, opts={}) => {
+exports.writeJsonToFileForce = (path, data, opts = {}) => {
   data = JSON.stringify(data, null, 2)
   writeToFileForce(path, data, opts)
 }

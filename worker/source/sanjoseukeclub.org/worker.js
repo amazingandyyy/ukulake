@@ -6,17 +6,17 @@ const { writeJsonToFileForce, writeToFileForce, absolutePath } = require('../../
 async function scrape (website) {
   const u = new URL(website)
   const source = u.host
-  return new Promise(async (resolve, reject)=>{
+  return new Promise(async (resolve, reject) => {
     const content = await axios.get(website)
     const $ = cheerio.load(content.data)
     const songs = []
     let tabs = ''
 
     $('center table').each((index, table) => {
-      let labels = ['sjuc']
-      if(index === 0) {
-      }
-      else if(index === 1) {
+      const labels = ['sjuc']
+      if (index === 0) {
+        console.log('')
+      } else if (index === 1) {
         labels.push('holiday')
       }
       $(table).find('p').each((index, p) => {
@@ -25,7 +25,7 @@ async function scrape (website) {
         let concatenatedText = ''
         $(p).find('span').each((index, span) => {
           const text = $(span).text()
-          if(!concatenatedText.includes(text)) {
+          if (!concatenatedText.includes(text)) {
             concatenatedText += text
           }
         })
@@ -36,7 +36,7 @@ async function scrape (website) {
           const originalSrc = `https://sanjoseukeclub.org/${href}`
           songs.push({
             tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${fileName}`,
-            source: source,
+            source,
             originalSrc,
             title: cleanedDisplayText,
             labels,
@@ -60,7 +60,7 @@ async function scrape (website) {
   })
 }
 
-async function main() {
+async function main () {
   await scrape('https://sanjoseukeclub.org/song_book.html')
 }
 
