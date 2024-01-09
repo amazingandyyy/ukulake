@@ -44,3 +44,9 @@ cp "$INDEX_FILE" "$ROOT_DIR/www/src/app/_data/index.json"
 
 # Clean up temporary file
 rm "$TMP_INDEX_FILE"
+
+git -C "$ROOT_DIR" add "$INDEX_FILE"
+git -C "$ROOT_DIR" add "$ROOT_DIR/www/src/app/_data/index.json"
+git -C "$ROOT_DIR" add "$STATS_FILE"
+git -C "$ROOT_DIR" commit -m "feat: release new api with $filtered_count islands"
+git -C "$ROOT_DIR" push origin main

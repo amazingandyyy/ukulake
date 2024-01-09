@@ -35,11 +35,24 @@ while IFS= read -r url; do
         echo "File $file_name already exists. Skipping download."
     else
         # Download the PDF file using wget
-        wget -P "$download_dir" "$url"
-        ((file_count++)) # Increment the file count after each download
+        wget -P --no-clobber "$download_dir" "$url"
 
-        # Check if the file count reaches 100
-        if [ $((file_count % 100)) -eq 0 ]; then
+        pushd $download_dir
+        for file in *\ *; do
+            if [[ -f "$file" ]]; then
+                newfile="${file%"${file##*[![:space:]]}"}"
+                mv "$file" "$newfile"
+                echo "Renamed '$file' to '$newfile'"
+            fi
+        done
+        popd
+
+        # CLean up
+        find "$download_dir" -type f ! -name "*.pdf" -exec rm -f {} +
+
+        ((file_count++)) # Increment the file count after each download
+        # Check if the file count reaches 50
+        if [ $((file_count % 50)) -eq 0 ]; then
             # Add all downloaded files, commit, and push to Git
             git -C "$download_dir" add .
             git -C "$download_dir" commit -m "feat: index $2"
@@ -48,12 +61,11 @@ while IFS= read -r url; do
     fi
 done < "$file_path"
 
-# clean up
 rm -rf $download_dir/*.pdf.*
-$ROOT_DIR/scripts/generate-api.sh
+#$ROOT_DIR/scripts/generate-api.sh
 
-# Add and commit remaining files (if less than 100) after the loop ends
-if [ $((file_count % 100)) -ne 0 ]; then
+# Add and commit remaining files (if less than 50) after the loop ends
+if [ $((file_count % 50)) -ne 0 ]; then
     git -C "$download_dir" add .
     git -C "$download_dir" commit -m "feat: index $2"
     git -C "$download_dir" push origin main # Change 'main' to your branch name

@@ -1,5 +1,24 @@
 #!/bin/bash
 
-ROOT_DIR="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )")"
+SOURCE=scorpexuke.com
+DIR="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )")"
+ROOT_DIR=$DIR/../..
 
-jq -s '[.[] | select(.title != null)]' info/*.json > songs.json
+echo "generating $ROOT_DIR/docs/$SOURCE/songs.json"
+jq -s '[.[] | select(.title != null)]' $ROOT_DIR/docs/$SOURCE/info/*.json > $ROOT_DIR/docs/$SOURCE/songs.json
+echo "generating $ROOT_DIR/docs/$SOURCE/tabs"
+jq -r '.[].originalSrc' $ROOT_DIR/docs/$SOURCE/songs.json > $ROOT_DIR/docs/$SOURCE/tabs
+
+node $DIR/$SOURCE/worker.js; echo "###  ###"
+
+# Count the total number of songs in songs.json
+#totalSongs=$(jq '. | length' $ROOT_DIR/docs/$SOURCE/songs.json)
+
+## Create stats.json with the required structure
+#echo '{
+#  "site": "'"$SOURCE"'",
+#  "totalSongs": '"$total_songs"'
+#}' > $ROOT_DIR/docs/$SOURCE/stats.json
+
+echo "downloading tabs PDFs"
+$ROOT_DIR/scripts/tabs-downloader.sh /docs/scorpexuke.com/tabs docs/scorpexuke.com/library

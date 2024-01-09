@@ -3,6 +3,7 @@
     "lint": "standard --fix **/*.js"
   },
   "dependencies": {
+    "async": "^3.2.5",
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
     "glob": "^10.3.3",

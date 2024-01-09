@@ -70,4 +70,4 @@ async function main() {
 }
 
 main()
-// ./scripts/links-downloader.sh docs/sanjoseukulakeclub.org/tabs docs/sanjoseukulakeclub.org
+// ./scripts/tabs-downloader.sh docs/sanjoseukulakeclub.org/tabs docs/sanjoseukulakeclub.org
