@@ -1,7 +1,7 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
 const path = require('path')
-const { writeJsonToFileForce, writeToFileForce, absolutePath } = require('../../utils')
+const { writeJsonToFileForce, writeToFileForce, absolutePath } = require('../utils')
 
 async function scrape (website) {
   const u = new URL(website)

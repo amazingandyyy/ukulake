@@ -2,9 +2,9 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const async = require('async')
 const fs = require('fs')
-const { logger } = require('../../utils')
+const { logger } = require('../utils')
 
-const { writeJsonToFileForce, absolutePath } = require('../../utils')
+const { writeJsonToFileForce, absolutePath } = require('../utils')
 
 const songs = []
 

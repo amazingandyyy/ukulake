@@ -2,7 +2,7 @@
 
 SOURCE=scorpexuke.com
 DIR="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )")"
-ROOT_DIR=$DIR/../..
+ROOT_DIR=$DIR/..
 
 echo "generating $ROOT_DIR/docs/$SOURCE/songs.json"
 jq -s '[.[] | select(.title != null)]' $ROOT_DIR/docs/$SOURCE/info/*.json > $ROOT_DIR/docs/$SOURCE/songs.json
