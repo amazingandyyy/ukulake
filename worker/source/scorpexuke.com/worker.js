@@ -20,6 +20,11 @@ const q = async.queue(function(task, callback) {
     .then(content => {
       const i = cheerio.load(content.data);
       const originalSrc = i('#su-stats a').attr('href');
+      if(!originalSrc) {
+        logger.info(`originalSrc not found for ${url}`)
+        
+        return callback()
+      }
       const fileName = originalSrc.replace('/https://scorpexuke.com/allpdfs/', '').replace('.pdf', '').trim()
       // logger.info(`found ${originalSrc}`)
       if (url && title) {
@@ -44,7 +49,10 @@ const q = async.queue(function(task, callback) {
 
       callback(); // Call the callback to indicate the task completion
     })
-    .catch(e => logger.error(`Error processing task: ${e.message}`));
+    .catch(e => {
+      q.push(task)
+      logger.error(`Error processing task: ${e.message}, will re-try`)
+    });
 }, 1);
 async function scrape (website) {
   // resetFile(absolutePath(`docs/${source}/songs.json`))
