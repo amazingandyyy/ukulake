@@ -29,13 +29,13 @@ valid_entries=()
 while IFS= read -r url; do
     local_file_path="${ROOT_DIR}/docs/${url#"https://amazingandyyy.com/ukulake/"}"
     if [ -f "$local_file_path" ]; then
-        echo "$url is valid"
+        echo "validate $url"
         title=$(jq -r --arg url "$url" '.[] | select(.tabSrc == $url) | .title' "$TMP_INDEX_FILE")
         if grep -qvE "$(IFS="|"; echo "${exclude_keywords[*]}")" <<< "$title"; then
             valid_entries+=("$url")
         fi
     else
-        echo "$local_file_path doesn't exist"
+        echo "$local_file_path doesn't exist, exclude $url from index"
     fi
 done < <(jq -r '.[].tabSrc' <<< "$filtered")
 
@@ -61,16 +61,16 @@ echo "Index file copied to: $ROOT_DIR/www/src/app/_data/index.json"
 echo "Removing temporary index file: $TMP_INDEX_FILE"
 rm "$TMP_INDEX_FILE"
 
-# echo "Adding files to git..."
-# git -C "$ROOT_DIR" add "$INDEX_FILE" "$ROOT_DIR/www/src/app/_data/index.json" "$STATS_FILE"
-# echo "Files added to git."
+echo "Adding files to git..."
+git -C "$ROOT_DIR" add "$INDEX_FILE" "$ROOT_DIR/www/src/app/_data/index.json" "$STATS_FILE"
+echo "Files added to git."
 
-# commit_message="feat: release new API with $filtered_count islands"
-# echo "Committing changes with message: \"$commit_message\""
-# git -C "$ROOT_DIR" commit -m "$commit_message"
+commit_message="feat: release new API with $filtered_count islands"
+echo "Committing changes with message: \"$commit_message\""
+git -C "$ROOT_DIR" commit -m "$commit_message"
 
-# echo "Pushing changes to origin main branch..."
-# git -C "$ROOT_DIR" push origin main
-# echo "Changes pushed successfully."
+echo "Pushing changes to origin main branch..."
+git -C "$ROOT_DIR" push origin main
+echo "Changes pushed successfully."
 
 echo "Script execution completed."
