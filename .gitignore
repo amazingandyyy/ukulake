@@ -5,3 +5,4 @@ package-lock.json
 .idea
 /dublin-development.icitywork.com/
 .env.*
+*/tmp/*
