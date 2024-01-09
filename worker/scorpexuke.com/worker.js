@@ -21,11 +21,11 @@ const q = async.queue(function (task, callback) {
 
         return callback()
       }
-      const fileName = originalSrc.replace('/https://scorpexuke.com/allpdfs/', '').replace('.pdf', '').trim()
+      const fileName = originalSrc.replace('https://scorpexuke.com/allpdfs/', '').replace('.pdf', '').trim()
       logger.info(`✅ found target ${originalSrc}`)
       if (url && title) {
         const d = {
-          tabSrc: `https://amazingandyyy.com/ukulake/${source}/info/${fileName}.pdf`,
+          tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${fileName}.pdf`,
           source,
           originalSrc,
           title,
