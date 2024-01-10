@@ -9,46 +9,25 @@ const { writeJsonToFileForce, absolutePath } = require('../utils')
 const songs = []
 
 const q = async.queue(function (task, callback) {
-  const { url, source, title, labels, artist, musicalKey } = task
+  const { url, source, title, labels, artist } = task
   logger.log('info', '📧 recieved', task)
+  const originalSrc = `https://www.marlowuke.co.uk/${url}`
+  if (url && title) {
+    const d = {
+      tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${title}.pdf`,
+      source,
+      originalSrc,
+      title,
+      labels,
+      additionalData: {}
+    }
+    if (artist) d.additionalData.artist = artist
+    writeJsonToFileForce(absolutePath(`docs/${source}/info/${title}.json`), d, { silent: true })
+  } else {
+    logger.log('warn', '📧 something is missing', task)
+  }
 
-  axios.get(url)
-    .then(content => {
-      const i = cheerio.load(content.data)
-      const originalSrc = i('#su-stats a').attr('href')
-      if (!originalSrc) {
-        logger.info(`😮 originalSrc not found for ${url}`, originalSrc)
-
-        return callback()
-      }
-      const fileName = originalSrc.replace('https://scorpexuke.com/allpdfs/', '').replace('.pdf', '').trim()
-      logger.info(`✅ found target ${originalSrc}`)
-      if (url && title) {
-        const d = {
-          tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${fileName}.pdf`,
-          source,
-          originalSrc,
-          title,
-          labels,
-          additionalData: {
-            artist,
-            musicalKey
-            // numberOfChords
-          }
-        }
-        if (artist) d.additionalData.artist = artist
-        if (musicalKey) d.additionalData.musicalKey = musicalKey
-        writeJsonToFileForce(absolutePath(`docs/${source}/info/${title}.json`), d, { silent: true })
-      } else {
-        logger.warn(`something is missing, url:${url} , title:${title}, artist:${artist}, musicalKey:${musicalKey}`)
-      }
-
-      callback() // Call the callback to indicate the task completion
-    })
-    .catch(e => {
-      q.push(task)
-      logger.error(`Error processing task: ${e.message}, will re-try`)
-    })
+  callback() // Call the callback to indicate the task completion
 }, 1)
 async function scrape (website) {
   // resetFile(absolutePath(`docs/${source}/songs.json`))
@@ -60,17 +39,16 @@ async function scrape (website) {
 
   const content = await axios.get(website)
   const $ = cheerio.load(content.data)
-  $('[itemtype="http://schema.org/MusicComposition"]').each((index, el) => {
+  $('tr').each((index, el) => {
     // if(index > 10) return;
-    const labels = ['scorpexuke']
-    const url = $(el).find('a').attr('href')
-    const title = $(el).find('span[itemprop="name"]').text()
-    const artist = $(el).find('span[itemprop="creator"]').text()
-    const musicalKey = $(el).find('span[itemprop="musicalKey"]').text()
+    const labels = ['marlowuke']
+    const url = $(el).find('td:nth-child(1)>a').attr('href')
+    const title = $(el).find('td:nth-child(1)>a').text()
+    const artist = $(el).find('td:nth-child(2)').text()
 
     const filePath = absolutePath(`docs/${source}/info/${title}.json`)
     if (!fs.existsSync(filePath)) {
-      q.push({ title, artist, musicalKey, labels, url, source })
+      q.push({ title, artist, labels, url, source })
     } else {
       logger.info(`✅ ${title} already processed; skipped`)
     }

@@ -29,15 +29,25 @@ do
   fi
 done
 
+node $DIR/$SOURCE/worker.js; echo "### Done Scraping ###"
 
-# # Count the total number of songs in songs.json
-# totalSongs=$(jq '. | length' $ROOT_DIR/docs/$SOURCE/songs.json)
+echo "generating $ROOT_DIR/docs/$SOURCE/songs.json"
+jq -s '[.[] | select(.title != null)]' $ROOT_DIR/docs/$SOURCE/info/*.json > $ROOT_DIR/docs/$SOURCE/songs.json
+echo "generating $ROOT_DIR/docs/$SOURCE/tabs"
+jq -r '.[] | select(.title != null) | "\(.title) \(.originalSrc)"' "$ROOT_DIR/docs/$SOURCE/songs.json" > "$ROOT_DIR/docs/$SOURCE/tabs"
 
-# # Create stats.json with the required structure
-# echo '{
-#  "site": "'"$SOURCE"'",
-#  "totalSongs": '"$totalSongs"'
-# }' > $ROOT_DIR/docs/$SOURCE/stats.json
+# Count the total number of songs in songs.json
+totalSongs=$(jq '. | length' $ROOT_DIR/docs/$SOURCE/songs.json)
 
-# echo "downloading tabs PDFs"
-# $ROOT_DIR/scripts/tabs-downloader.sh /docs/scorpexuke.com/tabs docs/scorpexuke.com/library
+# Create stats.json with the required structure
+echo '{
+ "site": "'"$SOURCE"'",
+ "totalSongs": '"$totalSongs"'
+}' > $ROOT_DIR/docs/$SOURCE/stats.json
+
+while IFS= read -r line || [[ -n "$line" ]]; do
+  title=$(echo "$line" | awk '{print $1}')
+  tab=$(echo "$line" | awk '{print $2}')
+  fileIndex="${tab#"https://www.marlowuke.co.uk/books/"}"
+  mv "$DIR/$SOURCE/pages/$fileIndex" "$ROOT_DIR/docs/$SOURCE/library/$title"
+done < "$ROOT_DIR/docs/$SOURCE/tabs"
