@@ -34,6 +34,7 @@ while IFS= read -r url; do
     if [ -f "$download_dir/$file_name" ]; then
         echo "File $file_name already exists. Skipping download."
     else
+        echo $url
         # Download the PDF file using wget
         wget -P "$download_dir" "$url"
 

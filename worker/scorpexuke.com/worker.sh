@@ -21,4 +21,4 @@ echo '{
 }' > $ROOT_DIR/docs/$SOURCE/stats.json
 
 echo "downloading tabs PDFs"
-$ROOT_DIR/scripts/tabs-downloader.sh /docs/scorpexuke.com/tabs docs/scorpexuke.com/library
+$ROOT_DIR/scripts/tabs-downloader.sh docs/$SOURCE/tabs docs/$SOURCE/library
