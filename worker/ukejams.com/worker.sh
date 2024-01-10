@@ -49,18 +49,10 @@ while IFS=$'\t' read -r title tab || [[ -n "$line" ]]; do
 
   # If 50 files are downloaded, add, commit, and push changes to Git
   if [ $((file_count % 50)) -eq 0 ]; then
-      echo "Committing changes: indexed $2 with $file_count files"
+      echo "Committing changes: indexed $2 with $file_count islands"
       git -C "$download_dir" add .
-      git -C "$download_dir" commit -m "feat: indexed $2 with $file_count files"
+      git -C "$download_dir" commit -m "feat: indexed $2 with $file_count islands"
       git -C "$download_dir" push origin main # Change 'main' to your branch name
   fi
 
 done < "$ROOT_DIR/docs/$SOURCE/tabs"
-
-# Add and commit remaining files (if less than 50) after the loop ends
-if [ $((file_count % 50)) -ne 0 ]; then
-    echo "Committing remaining changes: indexed $2 with $file_count files"
-    git -C "$download_dir" add .
-    git -C "$download_dir" commit -m "feat: indexed $2 with $file_count files"
-    git -C "$download_dir" push origin main # Change 'main' to your branch name
-fi
