@@ -35,7 +35,7 @@ async function scrape (website) {
   // resetFile(absolutePath(`docs/${source}/tabs`))
 
   const u = new URL(website)
-  const source = u.host
+  const source = u.host.replace('www.', '')
 
   const content = await axios.get(website)
   const $ = cheerio.load(content.data)
