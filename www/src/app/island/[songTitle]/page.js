@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSearchStore } from '@/stores'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 export default function Page ({ params }) {
   const router = useRouter()
@@ -101,13 +102,13 @@ export default function Page ({ params }) {
         </div>
       </div>
       <div className='flex bg-white shadow-sm col-span-3 h-12 md:h-16 p-2 md:p-4 flex-row items-center justify-between'>
-        <a href='/'>
+        <Link href='/'>
           <div className='hover:opacity-70 self-start font-semibold text-2xl'>
             <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
             <span className='pl-1 text-gray-900 inline-block'>Ukulake</span>
             <span className='pl-1 hidden md:inline-block text-gray-900 font-light'>Island</span>
           </div>
-        </a>
+        </Link>
         <div className='ml-2 flex-1 p-2 rounded-xl m-1 items-center font-bold hidden md:flex'>
           {/* music */}
           <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
