@@ -30,10 +30,6 @@ const q = async.queue(function (task, callback) {
   callback() // Call the callback to indicate the task completion
 }, 1)
 async function scrape (website) {
-  // resetFile(absolutePath(`docs/${source}/songs.json`))
-  // resetFile(absolutePath(`docs/${source}/stats.json`))
-  // resetFile(absolutePath(`docs/${source}/tabs`))
-
   const u = new URL(website)
   const source = u.host.replace('www.', '')
 

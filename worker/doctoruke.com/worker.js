@@ -1,71 +1,84 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
-const { writeJsonToFileForce, writeToFileForce, absolutePath } = require('../../utils')
-const htmlKeyToPdfKey = require('./dict.json')
+const async = require('async')
+const fs = require('fs')
+const { logger } = require('../utils')
+
+const { writeJsonToFileForce, absolutePath } = require('../utils')
+
+let totalSongs = 0
+
+const q = async.queue(function (task, callback) {
+  const { url, source, title, labels, artist, beginnerFriendly } = task
+  logger.log('info', '📧 recieved', task)
+  let originalSrc = `https://www.${source}${url}`
+  if (url.includes('.pdf')) {
+    originalSrc = `https://www.${source}/${url}`
+  }
+  if (url && title) {
+    const d = {
+      tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${title}.pdf`,
+      source,
+      originalSrc,
+      title,
+      labels,
+      additionalData: {}
+    }
+    if (beginnerFriendly) {
+      d.additionalData.beginnerFriendly = true
+    }
+    if (artist.includes('(') && artist.includes(')')) {
+      d.additionalData.artist = artist.replace('(', '').replace(')', '')
+    }
+    totalSongs++
+    writeJsonToFileForce(absolutePath(`docs/${source}/info/${title}.json`), d, { silent: true })
+  } else {
+    logger.log('warn', '📧 something is missing', task)
+  }
+
+  callback() // Call the callback to indicate the task completion
+}, 1)
+// q.drain(() => {
+//   console.log('all items have been processed');
+//   writeJsonToFileForce(absolutePath(`docs/${source}/stats.json`), {
+//     site: source,
+//     totalSongs: totalSongs
+//   })
+//   logger.info(`ADDED ${totalSongs} songs`)
+// })
 
 async function scrape (website) {
   const u = new URL(website)
-  const source = u.host
-  return new Promise(async (resolve, reject) => {
-    const content = await axios.get(website)
-    const $ = cheerio.load(content.data)
-    const songs = []
-    let tabs = ''
+  const source = u.host.replace('www.', '')
+  const labels = ['marlowuke']
+  const content = await axios.get(website)
+  const $ = cheerio.load(content.data)
 
-    $('li').each(async (index, element) => {
-      const labels = ['doctoruke']
-      if (index > 6) {
-        const link = $(element).find('a').first().attr('href')
-        let originalSrc = `https://www.${source}${link}`
-        if (link.includes('.pdf')) {
-          originalSrc = `https://www.${source}/${link}`
-        }
-        const fileName = originalSrc.replace(`https://www.${source}`, '').replace('/_player/', '').replace('.html', '').replace('.pdf', '').replace('_medleys', '').replace(/\//g, '').trim()
-        const title = $(element).find('a').text().replace('BAR', '')
-        const artistName = $(element).contents().filter(function () {
-          return this.nodeType === 3 // Filter only text nodes
-        }).text().trim()
-        const pdfKey = htmlKeyToPdfKey[fileName] || fileName
-        // if(pdfKey===) console.log(`${fileName} doesn't have pdfKey`)
-        // Pushing data to the array
-        if (originalSrc && fileName && title && !fileName.includes('http:') && !fileName.includes('https:')) {
-          const obj = {
-            tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${pdfKey}.pdf`,
-            source,
-            originalSrc,
-            title,
-            labels,
-            additionalData: {}
-          }
-          const redTextExists = $(element).find('.redText').length > 0
-          if (redTextExists) {
-            obj.additionalData.beginnerFriendly = true
-          }
-          if (artistName.includes('(') && artistName.includes(')')) {
-            obj.additionalData.artist = artistName.replace('(', '').replace(')', '')
-          }
-          songs.push(obj)
+  $('li').each((index, el) => {
+    if (index > 6) {
+      const url = $(el).find('a').first().attr('href')
+      const title = $(el).find('a').text().replace('BAR', '')
+      const artist = $(el).contents().filter(function () {
+        return this.nodeType === 3 // Filter only text nodes
+      }).text().trim()
+      const beginnerFriendly = $(el).find('.redText').length > 0
 
-          tabs += `https://www.doctoruke.com/${pdfKey}.pdf\n`
-        }
+      const filePath = absolutePath(`docs/${source}/info/${title}.json`)
+      if (!fs.existsSync(filePath)) {
+        q.push({title, artist, labels, url, source, beginnerFriendly})
+      } else {
+        logger.info(`✅ ${title} already processed; skipped`)
       }
-    })
-
-    const stats = {
-      site: source,
-      totalSongs: songs.length
     }
-
-    // Displaying the result as JSON
-    writeJsonToFileForce(absolutePath(`docs/${source}/songs.json`), songs)
-    writeJsonToFileForce(absolutePath(`docs/${source}/stats.json`), stats)
-    writeToFileForce(absolutePath(`docs/${source}/tabs`), tabs)
   })
 }
 
 async function main () {
-  await scrape('https://doctoruke.com/songs.html')
+  try {
+    await scrape('https://doctoruke.com/songs.html')
+  } catch (e) {
+    logger.error(`Scraping error: ${e.message}`)
+  }
 }
 
 main()
-// ./scripts/tabs-downloader.sh docs/sanjoseukulakeclub.org/tabs docs/sanjoseukulakeclub.org
