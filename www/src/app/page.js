@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { debounce } from 'lodash'
 
 const suggestSongs = [
@@ -68,9 +69,22 @@ const suggestSongs = [
 ]
 
 export default function Songs () {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const searchTermUrl = searchParams.get('q')
+
   const [result, setResult] = useState(null)
   const [searchTerms, setSearchTerms] = useState('')
   const inputRef = useRef(null)
+
+  const createQueryString = useCallback((name, value) => {
+    const params = new URLSearchParams(searchParams)
+    params.set(name, value)
+    return params.toString()
+  },
+  [searchParams]
+  )
 
   const debounceSearch = debounce((q) => {
     if (q.length > 2) {
@@ -79,17 +93,33 @@ export default function Songs () {
         .then((res) => res.json())
         .then((data) => {
           setResult(data)
+          router.push(`${pathname}?${createQueryString('q', q)}`)
         })
     }
   }, 200)
 
   useEffect(() => {
-    debounceSearch(searchTerms)
+    if (searchTermUrl) {
+      setSearchTerms(searchTermUrl)
+    }
+  }
+  , [searchTermUrl])
+
+  useEffect(() => {
+    if (searchTerms !== searchTermUrl || !result) {
+      debounceSearch(searchTerms)
+    }
   }, [searchTerms])
 
   const searchOnClick = useCallback((v) => {
     setSearchTerms(v)
     inputRef.current.focus()
+  })
+
+  const resetSearch = useCallback(() => {
+    setSearchTerms('')
+    inputRef.current.focus()
+    router.push('/')
   })
 
   return (
@@ -104,7 +134,7 @@ export default function Songs () {
         </Link>
         <div className='flex px-2 w-full flex-col items-center justify-stretch pt-6'>
           <input
-            className='text-lg text-center w-full max-w-md p-4 rounded-full bg-white shadow-2xl shadow-gray-400 focus:shadow-none m-1 focus:outline-none ring-2 focus:ring-teal-600 ring-gray-300'
+            className={`text-lg text-center w-full max-w-md p-4 rounded-full bg-white shadow-2xl shadow-gray-400 focus:shadow-none m-1 focus:outline-none ring-2 focus:ring-teal-600 ring-gray-300 ${searchTerms ? 'ring-2 ring-teal-600 shadow-none' : ''}`}
             type='text'
             ref={inputRef}
             placeholder='Search Songs in the Ukulake'
@@ -112,7 +142,7 @@ export default function Songs () {
             onChange={(e) => setSearchTerms(e.target.value)}
           />
           {searchTerms && (
-            <div onClick={() => searchOnClick('')} disabled={Boolean(!searchTerms)} className='inline-block p-1 px-[10px] hover:bg-teal-700 text-[10px] font-semibold rounded-full shadow-2xl bg-teal-600 active:bg-teal-600 m-1 focus:ring-2 text-white select-none active:outline-none cursor-pointer'>
+            <div onClick={() => resetSearch()} disabled={Boolean(!searchTerms)} className='inline-block p-1 px-[10px] hover:bg-teal-700 text-[10px] font-semibold rounded-full shadow-2xl bg-teal-600 active:bg-teal-600 m-1 focus:ring-2 text-white select-none active:outline-none cursor-pointer'>
               new search
             </div>
           )}
