@@ -10,7 +10,7 @@ const useSearchStore = create((set, get) => ({
     set({ input: title })
   },
   fetchIsland: (source, title, videoKey) => {
-    const url = `/api/songs?title=${title}&source=${source}`
+    const url = `/api/island?title=${title}&source=${source}`
     fetch(url)
       .then((res) => res.json())
       .then((data) => {

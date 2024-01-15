@@ -9,7 +9,7 @@ async function searchSong (source, title) {
     title
   })
 }
-// Request: /api/songs?name=andy
+// Request: /api/island?name=andy
 // Response: { message: 'Hello andy!' }
 export async function GET (request) {
   const { searchParams } = new URL(request.url)
