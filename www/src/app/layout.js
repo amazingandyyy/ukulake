@@ -1,4 +1,5 @@
 import Head from 'next/head'
+
 import Script from 'next/script'
 
 import './globals.scss'
@@ -68,7 +69,6 @@ export default function RootLayout ({ children }) {
       </Head>
       <body className='select-none'>
         {children}
-
       </body>
     </html>
   )

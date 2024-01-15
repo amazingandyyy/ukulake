@@ -1,26 +1,33 @@
 import { NextResponse } from 'next/server'
-import validateAuthToken from './validate'
+import axios from 'axios'
 
-// Request: /api/auth {accessToken='xxx'}
-export async function GET (req, res) {
-  // parse request body in nextjs
-  try {
-    const token = req.headers.get('Authorization').replace('Bearer ', '')
-    console.log(token)
-
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized - Missing Access Token' })
+export const config = {
+  api: {
+    bodyParser: {
+      enable: true,
+      sizeLimit: '1mb'
     }
-
-    const decodedToken = await validateAuthToken(token)
-    console.log('Decoded Token:', decodedToken)
-
-    // Your logic for handling the authenticated request goes here
-
-    NextResponse.json({ message: 'Hello from the private API!' })
-  } catch (error) {
-    console.error('Token Validation Error:', error.message)
-    NextResponse.json({ error: 'Unauthorized - Invalid Access Token' })
   }
-  NextResponse.json({ error: 'Unauthorized - Invalid Access Token' })
+}
+// Request: /api/auth {accessToken='xxx'}
+// Response: { message: 'Hello andy!' }
+export async function POST (req) {
+  // parse request body in nextjs
+  const body = await req.json()
+  console.log(body)
+  const accessToken = body.accessToken || ''
+  if (!accessToken) return NextResponse.json({ status: 500, body: { message: 'No access token' } })
+  axios('https://www.googleapis.com/auth/userinfo.email', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  }).then((res) => {
+    console.log(res)
+    return NextResponse.json(res.data)
+  })
+    .catch(e => {
+      console.log(e.message)
+      console.log(e.message)
+    })
 }
