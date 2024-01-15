@@ -72,10 +72,6 @@ const suggestSongs = [
 function Login () {
   const login = useCallback((e) => {
     console.log('hello', e)
-    // axios.get('/api/auth')
-    //   .then((res) => {
-    //     console.log(res)
-    //   })
   })
 
   return (
@@ -143,10 +139,10 @@ export default function Songs () {
 
   return (
     <div className='flex flex-col w-screen h-screen items-center'>
-      <div className='cursor-pointer flex bg-white shadow-none h-12 md:h-16 p-2 md:p-4 flex-row items-center justify-end w-full'>
+      <div className='hidden cursor-pointer flex bg-white shadow-none h-12 md:h-16 p-2 md:p-4 flex-row items-center justify-end w-full'>
         <Login />
       </div>
-      <div className='flex flex-col items-center w-full pt-36'>
+      <div className='flex flex-col items-center w-full pt-48'>
         <Link href='/'>
           <div className='font-semibold text-3xl'>
             <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
