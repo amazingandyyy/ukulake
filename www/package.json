@@ -9,12 +9,15 @@
     "lint": "standard --fix ."
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@heroicons/react": "^2.0.18",
     "@hotjar/browser": "^1.0.9",
     "add-to-calendar-button-react": "^2.3.1",
     "autoprefixer": "10.4.14",
     "disqus-react": "^1.1.5",
     "eslint-config-next": "13.4.9",
+    "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^3.1.0",
     "lodash": "^4.17.21",
     "next": "^13.4.9",
     "postcss": "8.4.25",
