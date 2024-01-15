@@ -26,6 +26,6 @@
         "no-dupe-keys": 0,
         "@next/next/no-img-element": 0,
         "no-tabs": 0,
-        "react/jsx-closing-tag-location": 0
+        "react/jsx-closing-tag-location": "off"
     }
 }
