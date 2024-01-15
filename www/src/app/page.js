@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
+import axios from 'axios'
 import { debounce } from 'lodash'
 
 const suggestSongs = [
@@ -68,6 +70,30 @@ const suggestSongs = [
   }
 ]
 
+function GoogleLoginBtn () {
+  const googleLoginResponse = useCallback(async (response) => {
+    console.log('Google Login Response:', response)
+    // Make an API call to get user profile information
+    if (response.access_token) {
+      const res = await axios.post('/api/auth', {
+        accessToken: response.access_token
+      })
+      console.log(res.data)
+    }
+  })
+
+  const login = useGoogleLogin({
+    onSuccess: googleLoginResponse
+  })
+  return (
+    <div className='p-2' onClick={() => login()}>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor' className='w-5 h-5'>
+        <path d='M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z' />
+      </svg>
+    </div>
+  )
+}
+
 export default function Songs () {
   const router = useRouter()
   const pathname = usePathname()
@@ -113,7 +139,7 @@ export default function Songs () {
 
   const searchOnClick = useCallback((v) => {
     setSearchTerms(v)
-    inputRef.current.focus()
+    // inputRef.current.focus()
   })
 
   const resetSearch = useCallback(() => {
@@ -123,57 +149,61 @@ export default function Songs () {
   })
 
   return (
-    <div className='flex flex-col h-screen items-center'>
-      <div className='flex flex-col items-center w-full pt-48'>
-        <Link href='/'>
-          <div className='font-semibold text-3xl'>
-            <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
-            <span className='pl-1 text-gray-900'>Ukulake</span>
-            <span className='pl-1 text-gray-900 font-light'>Harbor</span>
-          </div>
-        </Link>
-        <div className='flex px-2 w-full flex-col items-center justify-stretch pt-6'>
-          <input
-            className={`text-lg text-center w-full max-w-md p-4 rounded-full bg-white shadow-2xl shadow-gray-400 focus:shadow-none m-1 focus:outline-none ring-2 focus:ring-teal-600 ring-gray-300 ${searchTerms ? 'ring-2 ring-teal-600 shadow-none' : ''}`}
-            type='text'
-            ref={inputRef}
-            placeholder='Search Songs in the Ukulake'
-            value={searchTerms}
-            onChange={(e) => setSearchTerms(e.target.value)}
-          />
-          {searchTerms && (
-            <div onClick={() => resetSearch()} disabled={Boolean(!searchTerms)} className='inline-block p-1 px-[10px] hover:bg-teal-700 text-[10px] font-semibold rounded-full shadow-2xl bg-teal-600 active:bg-teal-600 m-1 focus:ring-2 text-white select-none active:outline-none cursor-pointer'>
-              new search
-            </div>
-          )}
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID}>
+      <div className='flex flex-col w-screen h-screen items-center'>
+        <div className='cursor-pointer flex bg-white shadow-none h-12 md:h-16 p-2 md:p-4 flex-row items-center justify-end w-full'>
+          <GoogleLoginBtn />
         </div>
-      </div>
-
-      {/* show top 20 beginner friendly songs */}
-      {!searchTerms &&
-        <div className='w-full max-w-4xl my-auto pt-12'>
-          <div className='flex flex-col items-center justify-center'>
-            <span className='text-sm text-gray-400 pb-2'>Beginner friendly recommendations from ChatGPT</span>
+        <div className='flex flex-col items-center w-full pt-36'>
+          <Link href='/'>
+            <div className='font-semibold text-3xl'>
+              <span className='bg-teal-600 text-white rounded-lg'>˙ᵕ˙</span>
+              <span className='pl-1 text-gray-900'>Ukulake</span>
+              <span className='pl-1 text-gray-900 font-light'>Harbor</span>
+            </div>
+          </Link>
+          <div className='flex px-2 w-full flex-col items-center justify-stretch pt-6'>
+            <input
+              className={`text-lg text-center w-full max-w-md p-4 rounded-full bg-white shadow-2xl shadow-gray-400 focus:shadow-none m-1 focus:outline-none ring-2 focus:ring-teal-600 ring-gray-300 ${searchTerms ? 'ring-2 ring-teal-600 shadow-none' : ''}`}
+              type='text'
+              ref={inputRef}
+              placeholder='Search Songs in the Ukulake'
+              value={searchTerms}
+              onChange={(e) => setSearchTerms(e.target.value)}
+            />
+            {searchTerms && (
+              <div onClick={() => resetSearch()} disabled={Boolean(!searchTerms)} className='inline-block p-1 px-[10px] hover:bg-teal-700 text-[10px] font-semibold rounded-full shadow-2xl bg-teal-600 active:bg-teal-600 m-1 focus:ring-2 text-white select-none active:outline-none cursor-pointer'>
+                new search
+              </div>
+            )}
           </div>
-          <div className='flex flex-col md:flex-row w-full justify-center pb-12'>
-            {suggestSongs.map((list, index) => {
-              return (
-                <div className='p-2 w-full text-center md:text-left' key={index}>
-                  <div className='font-medium'>
-                    {list.title}
-                  </div>
-                  {list.songs.map(song => (
-                    <div key={song} onClick={(e) => searchOnClick(e.target.innerText)} className='hover:text-teal-600 active:text-teal-700 text-gray-70 cursor-pointer'>
-                      <span className='text-md opacity-80 block'>{song}</span>
+        </div>
+
+        {/* show top 20 beginner friendly songs */}
+        {!searchTerms &&
+          <div className='w-full max-w-4xl my-auto pt-12'>
+            <div className='flex flex-col items-center justify-center'>
+              <span className='text-sm text-gray-400 pb-2'>Beginner friendly recommendations from ChatGPT</span>
+            </div>
+            <div className='flex flex-col md:flex-row w-full justify-center pb-12'>
+              {suggestSongs.map((list, index) => {
+                return (
+                  <div className='p-2 w-full text-center md:text-left' key={index}>
+                    <div className='font-medium'>
+                      {list.title}
                     </div>
-                  ))}
-                </div>
-              )
-            })}
-          </div>
-        </div>}
+                    {list.songs.map(song => (
+                      <div key={song} onClick={(e) => searchOnClick(e.target.innerText)} className='hover:text-teal-600 active:text-teal-700 text-gray-70 cursor-pointer'>
+                        <span className='text-md opacity-80 block'>{song}</span>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
+            </div>
+          </div>}
 
-      {searchTerms &&
+        {searchTerms &&
       (result !== null
         ? (
           <div className='pt-12'>
@@ -202,6 +232,7 @@ export default function Songs () {
             </div>
           </div>)
       )}
-    </div>
+      </div>
+    </GoogleOAuthProvider>
   )
 }

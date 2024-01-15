@@ -4,7 +4,7 @@ import Script from 'next/script'
 
 import './globals.scss'
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID
-const CRISP_WEBSITE_ID = process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID
+// const CRISP_WEBSITE_ID = process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID
 
 export const metadata = {
   metadataBase: new URL('https://ukulake.amazyyy.com'),
@@ -50,13 +50,13 @@ export default function RootLayout ({ children }) {
           `
         }}
       />
-      <Script
+      {/* <Script
         strategy='afterInteractive' id='crisp-1' dangerouslySetInnerHTML={{
           __html: `
             window.$crisp=[];window.CRISP_WEBSITE_ID="${CRISP_WEBSITE_ID}";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
           `
         }}
-      />
+      /> */}
 
       <Head>
         <link rel='apple-touch-icon' sizes='180x180' href='/icons/apple-touch-icon.png' />
@@ -67,7 +67,7 @@ export default function RootLayout ({ children }) {
         <meta name='msapplication-TileColor' content='#da532c' />
         <meta name='theme-color' content='#ffffff' />
       </Head>
-      <body>
+      <body className='select-none'>
         {children}
       </body>
     </html>
