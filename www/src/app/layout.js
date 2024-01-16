@@ -50,13 +50,13 @@ export default function RootLayout ({ children }) {
           `
         }}
       />
-      {/* <Script
+      <Script
         strategy='afterInteractive' id='crisp-1' dangerouslySetInnerHTML={{
           __html: `
             window.$crisp=[];window.CRISP_WEBSITE_ID="${CRISP_WEBSITE_ID}";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
           `
         }}
-      /> */}
+      />
 
       <Head>
         <link rel='apple-touch-icon' sizes='180x180' href='/icons/apple-touch-icon.png' />

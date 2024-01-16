@@ -25,19 +25,26 @@ filtered=$(jq 'group_by(.tabSrc) | map(select(length == 1) | .[])' "$TMP_INDEX_F
 
 # Validate tabSrc using local file existence and exclude based on .title keywords
 echo "Validating tabSrc and excluding based on .title keywords..."
+drop_count=0
 valid_entries=()
 while IFS= read -r url; do
     local_file_path="${ROOT_DIR}/docs/${url#"https://amazingandyyy.com/ukulake/"}"
-    if [ -f "$local_file_path" ]; then
-        echo "validate $url"
+    if [ $1 == "-unsafe" ]; then
+        echo "⚠️\t validate $url"
+        valid_entries+=("$url")
+    else if [ -f "$local_file_path" ]; then
+        echo "✅\t validate $url"
         title=$(jq -r --arg url "$url" '.[] | select(.tabSrc == $url) | .title' "$TMP_INDEX_FILE")
         if grep -qvE "$(IFS="|"; echo "${exclude_keywords[*]}")" <<< "$title"; then
             valid_entries+=("$url")
         fi
     else
-        echo "$local_file_path doesn't exist, exclude $url from index"
+        echo "❌\t$local_file_path doesn't exist, exclude $url from index"
+        ((drop_count++))
     fi
 done < <(jq -r '.[].tabSrc' <<< "$filtered")
+
+echo "Dropped $drop_count entries from index."
 
 # Filtered content with only valid tabSrc entries
 filtered=$(jq --argjson valid_urls "$(printf '%s\n' "${valid_entries[@]}" | jq -R . | jq -s '.')" '. | map(select(.tabSrc as $ts | $valid_urls | index($ts)))' <<< "$filtered")
