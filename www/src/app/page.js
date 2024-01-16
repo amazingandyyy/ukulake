@@ -114,7 +114,7 @@ export default function Songs () {
   }, 200)
 
   useEffect(() => {
-    if (searchTermUrl) {
+    if (searchTermUrl !== undefined && searchTermUrl !== searchTerms) {
       setSearchTerms(searchTermUrl)
     }
   }
