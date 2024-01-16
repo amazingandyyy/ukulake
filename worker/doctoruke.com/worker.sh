@@ -27,16 +27,15 @@ while IFS=$'\t' read -r title tab || [[ -n "$line" ]]; do
   else
     echo "Downloading $title.pdf"
     wget -O "$download_dir/$title.pdf" $tab
+    ((file_count++)) # Increment the file count after each download
   fi
 
-  ((file_count++)) # Increment the file count after each download
-
   # If 50 files are downloaded, add, commit, and push changes to Git
-  if [ $((file_count % 50)) -eq 0 ]; then
-      echo "Committing changes: indexed $SOURCE with $file_count islands"
-      git -C "$download_dir" add .
-      git -C "$download_dir" commit -m "feat: indexed $SOURCE with $file_count islands"
-      git -C "$download_dir" push origin main # Change 'main' to your branch name
+  if [ $((file_count % 50)) -eq 0 ] && [ $file_count -ne 0 ]; then
+    echo "Committing changes: indexed $SOURCE with $file_count islands"
+    git -C "$download_dir" add $ROOT_DIR/docs/$SOURCE/library
+    git -C "$download_dir" diff --quiet --exit-code || git -C "$download_dir" commit -m "feat: indexed $SOURCE with $file_count islands"
+    git -C "$download_dir" push origin main # Change 'main' to your branch name
   fi
 
 done < "$ROOT_DIR/docs/$SOURCE/tabs"
