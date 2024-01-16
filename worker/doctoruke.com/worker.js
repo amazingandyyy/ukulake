@@ -3,6 +3,7 @@ const cheerio = require('cheerio')
 const async = require('async')
 const fs = require('fs')
 const { logger } = require('../utils')
+const htmlKeyToPdfKey = require('./dict.json')
 
 const { writeJsonToFileForce, absolutePath } = require('../utils')
 
@@ -10,33 +11,84 @@ let totalSongs = 0
 
 const q = async.queue(function (task, callback) {
   const { url, source, title, labels, artist, beginnerFriendly } = task
+  // url is like /_player/upupandaway.html:
+  let ok = false;
+  let originalPage = `https://www.${source}/${url}`
   logger.log('info', '📧 recieved', task)
-  let originalSrc = `https://www.${source}${url}`
+  let originalSrc = ''
   if (url.includes('.pdf')) {
+    ok = true
     originalSrc = `https://www.${source}/${url}`
-  }
-  if (url && title) {
     const d = {
       tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${title}.pdf`,
       source,
+      originalPage,
       originalSrc,
       title,
       labels,
       additionalData: {}
     }
-    if (beginnerFriendly) {
-      d.additionalData.beginnerFriendly = true
+    if (url && title) {
+      if (beginnerFriendly) {
+        d.additionalData.beginnerFriendly = true
+      }
+      if (artist.includes('(') && artist.includes(')')) {
+        d.additionalData.artist = artist.replace('(', '').replace(')', '')
+      }
+      totalSongs++
+      if (ok) {
+        writeJsonToFileForce(absolutePath(`docs/${source}/info/${title}.json`), d, { silent: true })
+      }else{
+        writeJsonToFileForce(absolutePath(`docs/${source}/_orphan/${title}.json`), d, { silent: true })
+      }
+    } else {
+      // logger.log('warn', '📧 something is missing', task)
+      writeJsonToFileForce(absolutePath(`docs/${source}/_orphan/${title}.json`), d, { silent: true })
     }
-    if (artist.includes('(') && artist.includes(')')) {
-      d.additionalData.artist = artist.replace('(', '').replace(')', '')
-    }
-    totalSongs++
-    writeJsonToFileForce(absolutePath(`docs/${source}/info/${title}.json`), d, { silent: true })
-  } else {
-    logger.log('warn', '📧 something is missing', task)
-  }
+    callback()
+  } else if (url.includes('_player')) {
+    ok = true
+    originalPage = `https://www.${source}${url}`
+    logger.log('info', `Request to validate originalSrc ${originalPage}`)
+    axios.get(originalPage).then((res) => {
+      const $ = cheerio.load(res.data)
+      const pdfName = $('script:contains("var pdfName")').html().match(/var pdfName = "(.*?)";/)[1];
+      originalSrc = `https://www.${source}/${pdfName}.pdf`
 
-  callback() // Call the callback to indicate the task completion
+      const d = {
+        tabSrc: `https://amazingandyyy.com/ukulake/${source}/library/${title}.pdf`,
+        source,
+        originalPage,
+        originalSrc,
+        title,
+        labels,
+        additionalData: {}
+      }
+      if (url && title) {
+        if (beginnerFriendly) {
+          d.additionalData.beginnerFriendly = true
+        }
+        if (artist.includes('(') && artist.includes(')')) {
+          d.additionalData.artist = artist.replace('(', '').replace(')', '')
+        }
+        totalSongs++
+        if (ok) {
+          writeJsonToFileForce(absolutePath(`docs/${source}/info/${title}.json`), d, { silent: true })
+        }else{
+          writeJsonToFileForce(absolutePath(`docs/${source}/_orphan/${title}.json`), d, { silent: true })
+        }
+      } else {
+        // logger.log('warn', '📧 something is missing', task)
+        writeJsonToFileForce(absolutePath(`docs/${source}/_orphan/${title}.json`), d, { silent: true })
+      }
+      callback()
+    }).catch((e) => {
+      logger.error(`Validation originalSrc error: ${originalPage}: ${e.message}`)
+      callback()
+    })
+  }else{
+    callback()
+  }
 }, 1)
 // q.drain(() => {
 //   console.log('all items have been processed');
@@ -53,11 +105,10 @@ async function scrape (website) {
   const labels = ['marlowuke']
   const content = await axios.get(website)
   const $ = cheerio.load(content.data)
-
   $('li').each((index, el) => {
     if (index > 6) {
-      const url = $(el).find('a').first().attr('href')
-      const title = $(el).find('a').text().replace('BAR', '')
+      const url = $(el).find('a').first().attr('href').replace(`http://www.${source}/`, '')
+      const title = $(el).find('a').text().replace('BAR', '').replace(/\s+/g, ' ').trim()
       const artist = $(el).contents().filter(function () {
         return this.nodeType === 3 // Filter only text nodes
       }).text().trim()
@@ -67,7 +118,7 @@ async function scrape (website) {
       if (!fs.existsSync(filePath)) {
         q.push({title, artist, labels, url, source, beginnerFriendly})
       } else {
-        logger.info(`✅ ${title} already processed; skipped`)
+        logger.info(`✅\t${title} already processed; skipped`)
       }
     }
   })

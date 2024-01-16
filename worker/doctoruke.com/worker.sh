@@ -33,9 +33,9 @@ while IFS=$'\t' read -r title tab || [[ -n "$line" ]]; do
 
   # If 50 files are downloaded, add, commit, and push changes to Git
   if [ $((file_count % 50)) -eq 0 ]; then
-      echo "Committing changes: indexed $2 with $file_count islands"
+      echo "Committing changes: indexed $SOURCE with $file_count islands"
       git -C "$download_dir" add .
-      git -C "$download_dir" commit -m "feat: indexed $2 with $file_count islands"
+      git -C "$download_dir" commit -m "feat: indexed $SOURCE with $file_count islands"
       git -C "$download_dir" push origin main # Change 'main' to your branch name
   fi
 
