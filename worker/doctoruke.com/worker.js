@@ -3,7 +3,6 @@ const cheerio = require('cheerio')
 const async = require('async')
 const fs = require('fs')
 const { logger } = require('../utils')
-const htmlKeyToPdfKey = require('./dict.json')
 
 const { writeJsonToFileForce, absolutePath } = require('../utils')
 
@@ -87,6 +86,7 @@ const q = async.queue(function (task, callback) {
       callback()
     })
   }else{
+    logger.error(`❌\t${title} ${url} has no pdf`)
     callback()
   }
 }, 1)
